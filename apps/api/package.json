@@ -10,10 +10,11 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@fastify/cors": "^11",
     "@rental-suite/db": "workspace:*",
     "@rental-suite/shared": "workspace:*",
     "fastify": "^5",
-    "@fastify/cors": "^11",
+    "jose": "^6.2.1",
     "zod": "^3"
   },
   "devDependencies": {
