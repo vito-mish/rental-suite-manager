@@ -10,4 +10,22 @@ class AppDelegate: FlutterAppDelegate {
   override func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
     return true
   }
+
+  override func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+    if !flag {
+      for window in sender.windows {
+        window.makeKeyAndOrderFront(self)
+      }
+    }
+    return true
+  }
+
+  override func applicationDidFinishLaunching(_ notification: Notification) {
+    let runningApps = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!)
+    if runningApps.count > 1 {
+      NSApp.terminate(nil)
+      return
+    }
+    super.applicationDidFinishLaunching(notification)
+  }
 }
