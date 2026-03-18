@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String?
+  name         String?
+  provider     String?  // google, apple, email
+  providerId   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  properties Property[]
+}
+
+model Property {
+  id         String         @id @default(cuid())
+  userId     String
+  name       String
+  floor      Int
+  roomNumber String
+  area       Float          // 坪數
+  status     PropertyStatus @default(VACANT)
+  facilities String[]
+  photos     String[]
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  user                User                 @relation(fields: [userId], references: [id])
+  leases              Lease[]
+  meterReadings       MeterReading[]
+  maintenanceRequests MaintenanceRequest[]
+
+  @@index([userId])
+}
+
+enum PropertyStatus {
+  VACANT
+  OCCUPIED
+  MAINTENANCE
+  ARCHIVED
+}
+
+model Tenant {
+  id          String    @id @default(cuid())
+  name        String
+  phone       String
+  email       String?
+  idNumber    String?
+  moveInDate  DateTime?
+  moveOutDate DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  leases              Lease[]
+  maintenanceRequests MaintenanceRequest[]
+}
+
+model Lease {
+  id          String      @id @default(cuid())
+  propertyId  String
+  tenantId    String
+  startDate   DateTime
+  endDate     DateTime
+  monthlyRent Int
+  deposit     Int
+  terms       String?
+  status      LeaseStatus @default(ACTIVE)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  property Property  @relation(fields: [propertyId], references: [id])
+  tenant   Tenant    @relation(fields: [tenantId], references: [id])
+  payments Payment[]
+
+  @@index([propertyId])
+  @@index([tenantId])
+}
+
+enum LeaseStatus {
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+model Payment {
+  id       String        @id @default(cuid())
+  leaseId  String
+  amount   Int
+  dueDate  DateTime
+  paidDate DateTime?
+  status   PaymentStatus @default(PENDING)
+  method   PaymentMethod?
+  receipt  String?
+  createdAt DateTime     @default(now())
+
+  lease Lease @relation(fields: [leaseId], references: [id])
+
+  @@index([leaseId])
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+enum PaymentMethod {
+  CASH
+  TRANSFER
+}
+
+model MeterReading {
+  id          String    @id @default(cuid())
+  propertyId  String
+  type        MeterType
+  reading     Float
+  readingDate DateTime
+  createdAt   DateTime  @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}
+
+enum MeterType {
+  WATER
+  ELECTRICITY
+}
+
+model MaintenanceRequest {
+  id          String              @id @default(cuid())
+  propertyId  String
+  tenantId    String?
+  category    String
+  description String
+  priority    MaintenancePriority @default(MEDIUM)
+  status      MaintenanceStatus   @default(PENDING)
+  cost        Int?
+  photos      String[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id])
+  tenant   Tenant?  @relation(fields: [tenantId], references: [id])
+
+  @@index([propertyId])
+}
+
+enum MaintenancePriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum MaintenanceStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
