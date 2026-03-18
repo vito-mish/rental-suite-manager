@@ -30,7 +30,7 @@
 | 副標題 | Manage smarter, rent easier. |
 | 支援平台 | macOS、Windows、Web、Android、iOS |
 | Stories | 10 |
-| Tasks | 54 |
+| Tasks | 57 |
 
 ---
 
@@ -38,14 +38,17 @@
 
 **目標**：建立整個專案的技術底座，確保各平台可以共用程式碼並獨立部署。
 
-| Task | 說明 | 類型 |
-|------|------|------|
-| T-01 | 建立 Monorepo 結構（Turborepo / Nx），規劃 `apps/` 與 `packages/` 目錄 | infra |
-| T-02 | 設定 Flutter 或 React Native 跨平台框架，支援 macOS、Windows、Android、iOS | FE |
-| T-03 | 建立 Web 前端專案（Next.js），配置 Tailwind CSS | FE |
-| T-04 | 設定後端 API 服務（Node.js + Fastify 或 Go），定義 REST / GraphQL 規範 | BE |
-| T-05 | 建立 CI/CD Pipeline（GitHub Actions），自動化各平台建置與測試 | infra |
-| T-06 | 設定共用設計 Token（Design System），統一色彩、字體、間距規範 | design |
+| Task | 說明 | 類型 | 狀態 |
+|------|------|------|------|
+| T-01 | 建立 Monorepo 結構（Turborepo），規劃 `apps/` 與 `packages/` 目錄 | infra | ✅ Done |
+| T-02a | 設定 Flutter 跨平台框架，驗證 macOS 建置與執行 | FE | ✅ Done |
+| T-02b | 驗證 Windows 建置與執行 | FE | |
+| T-02c | 驗證 Android 建置與執行 | FE | |
+| T-02d | 驗證 iOS 建置與執行 | FE | |
+| T-03 | 建立 Web 前端專案（Next.js），配置 Tailwind CSS | FE | |
+| T-04 | 設定後端 API 服務（Node.js + Fastify），定義 REST 規範 | BE | ✅ Done |
+| T-05 | 建立 CI/CD Pipeline（GitHub Actions），自動化各平台建置與測試 | infra | |
+| T-06 | 設定共用設計 Token（Design System），統一色彩、字體、間距規範 | design | ✅ Done |
 
 ---
 
@@ -178,4 +181,4 @@
 
 ---
 
-*共 10 Stories、54 Tasks*
+*共 10 Stories、57 Tasks*
