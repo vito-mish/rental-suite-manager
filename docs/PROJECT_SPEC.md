@@ -56,13 +56,13 @@
 
 **目標**：提供安全的帳號系統，支援多種登入方式與多裝置同步。
 
-| Task | 說明 | 類型 |
-|------|------|------|
-| T-07 | 實作 Email / 密碼註冊與登入流程 | BE |
-| T-08 | 整合 Google / Apple SSO 第三方登入 | BE |
-| T-09 | JWT Access Token + Refresh Token 管理機制 | BE |
-| T-10 | 設計登入、忘記密碼、重設密碼畫面（各平台適配） | FE |
-| T-11 | 多裝置同步登入狀態管理與登出處理 | FE |
+| Task | 說明 | 類型 | 狀態 |
+|------|------|------|------|
+| T-07 | 實作 Email / 密碼註冊與登入流程（Supabase Auth） | BE | ✅ Done |
+| T-08 | 整合 Google / Apple SSO 第三方登入 | BE | |
+| T-09 | JWT Access Token + Refresh Token 管理機制（Supabase 自動處理） | BE | ✅ Done |
+| T-10 | 設計登入、忘記密碼、重設密碼畫面（macOS 驗證通過） | FE | ✅ Done |
+| T-11 | 多裝置同步登入狀態管理與登出處理（Supabase session） | FE | ✅ Done |
 
 ---
 
