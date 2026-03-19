@@ -79,6 +79,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
         title: const Text('房源管理'),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'property_fab',
         onPressed: () async {
           final result = await Navigator.push<bool>(
             context,
