@@ -29,6 +29,7 @@ class PropertyService {
     required int floor,
     required String roomNumber,
     required double area,
+    required int monthlyRent,
     List<String> facilities = const [],
   }) async {
     final res = await ApiService.post('/api/properties', {
@@ -36,6 +37,7 @@ class PropertyService {
       'floor': floor,
       'roomNumber': roomNumber,
       'area': area,
+      'monthlyRent': monthlyRent,
       'facilities': facilities,
     });
     return Property.fromJson(res);

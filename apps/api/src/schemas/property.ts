@@ -7,6 +7,7 @@ export const createPropertySchema = z.object({
   floor: z.number().int(),
   roomNumber: z.string().min(1).max(20),
   area: z.number().positive(),
+  monthlyRent: z.number().int().positive(),
   status: PropertyStatus.optional().default('VACANT'),
   facilities: z.array(z.string()).optional().default([]),
 });

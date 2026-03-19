@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../models/property.dart';
 import '../../services/property_service.dart';
 
@@ -18,6 +19,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
   late final TextEditingController _floorController;
   late final TextEditingController _roomNumberController;
   late final TextEditingController _areaController;
+  late final TextEditingController _rentController;
   bool _loading = false;
 
   static const _allFacilities = [
@@ -32,6 +34,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
     _floorController = TextEditingController(text: p?.floor.toString() ?? '');
     _roomNumberController = TextEditingController(text: p?.roomNumber ?? '');
     _areaController = TextEditingController(text: p?.area.toString() ?? '');
+    _rentController = TextEditingController(text: p != null && p.monthlyRent > 0 ? p.monthlyRent.toString() : '');
     _selectedFacilities = Set.from(p?.facilities ?? []);
   }
 
@@ -40,6 +43,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
     _floorController.dispose();
     _roomNumberController.dispose();
     _areaController.dispose();
+    _rentController.dispose();
     super.dispose();
   }
 
@@ -55,6 +59,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
           'floor': int.parse(_floorController.text),
           'roomNumber': roomNumber,
           'area': double.parse(_areaController.text),
+          'monthlyRent': _rentController.text.isNotEmpty ? int.parse(_rentController.text) : 0,
           'facilities': _selectedFacilities.toList(),
         });
       } else {
@@ -64,6 +69,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
           floor: int.parse(_floorController.text),
           roomNumber: roomNumber,
           area: double.parse(_areaController.text),
+          monthlyRent: _rentController.text.isNotEmpty ? int.parse(_rentController.text) : 0,
           facilities: _selectedFacilities.toList(),
         );
       }
@@ -132,10 +138,30 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
                     suffixText: '坪',
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+                  ],
                   validator: (v) {
                     if (v == null || v.isEmpty) return '請輸入坪數';
                     final n = double.tryParse(v);
                     if (n == null || n <= 0) return '請輸入有效數字';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _rentController,
+                  decoration: const InputDecoration(
+                    labelText: '月租金',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.attach_money),
+                    suffixText: '元',
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return '請輸入月租金';
+                    final n = int.tryParse(v);
+                    if (n == null || n <= 0) return '請輸入有效金額';
                     return null;
                   },
                 ),

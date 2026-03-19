@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import propertyRoutes from './routes/properties';
 import tenantRoutes from './routes/tenants';
+import leaseRoutes from './routes/leases';
 
 const app = Fastify({ logger: true });
 
@@ -13,6 +14,7 @@ app.get('/health', async () => {
 
 app.register(propertyRoutes, { prefix: '/api' });
 app.register(tenantRoutes, { prefix: '/api' });
+app.register(leaseRoutes, { prefix: '/api' });
 
 const start = async () => {
   const port = Number(process.env.PORT) || 3001;

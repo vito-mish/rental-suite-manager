@@ -9,12 +9,14 @@ class PropertyListScreen extends StatefulWidget {
   const PropertyListScreen({super.key});
 
   @override
-  State<PropertyListScreen> createState() => _PropertyListScreenState();
+  State<PropertyListScreen> createState() => PropertyListScreenState();
 }
 
-class _PropertyListScreenState extends State<PropertyListScreen> {
+class PropertyListScreenState extends State<PropertyListScreen> {
+  void refresh() => _loadProperties();
   List<Property> _properties = [];
   bool _loading = true;
+  bool _initialized = false;
   String? _error;
   PropertyStatus? _statusFilter;
 
@@ -25,19 +27,19 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
   }
 
   Future<void> _loadProperties() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
+    if (!_initialized) {
+      setState(() { _loading = true; _error = null; });
+    }
     try {
       final result = await PropertyService.list(status: _statusFilter);
       setState(() {
         _properties = result.data;
         _loading = false;
+        _initialized = true;
       });
     } catch (e) {
       setState(() {
-        _error = e.toString();
+        if (!_initialized) _error = e.toString();
         _loading = false;
       });
     }
@@ -75,9 +77,6 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('房源管理'),
-      ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'property_fab',
         onPressed: () async {

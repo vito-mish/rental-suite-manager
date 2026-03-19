@@ -28,8 +28,9 @@ model Property {
   name       String
   floor      Int
   roomNumber String
-  area       Float          // 坪數
-  status     PropertyStatus @default(VACANT)
+  area        Float          // 坪數
+  monthlyRent Int
+  status      PropertyStatus @default(VACANT)
   facilities String[]
   photos     String[]
   createdAt  DateTime       @default(now())

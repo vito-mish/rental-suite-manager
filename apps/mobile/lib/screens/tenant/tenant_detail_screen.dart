@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../models/tenant.dart';
 import '../../services/tenant_service.dart';
+import '../../services/lease_service.dart';
 import 'tenant_form_screen.dart';
+import 'move_in_screen.dart';
 
 class TenantDetailScreen extends StatefulWidget {
   final String tenantId;
@@ -65,6 +67,92 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
         return Colors.red;
       default:
         return Colors.grey;
+    }
+  }
+
+  /// Find the active lease if any
+  LeaseHistory? get _activeLease {
+    if (_tenant == null) return null;
+    try {
+      return _tenant!.leases.firstWhere((l) => l.status == 'ACTIVE');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Widget _buildLeaseAction() {
+    final active = _activeLease;
+    if (active != null) {
+      return SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          onPressed: () => _handleMoveOut(active),
+          icon: const Icon(Icons.logout, color: Colors.red),
+          label: Text('退房（${active.floor}F ${active.roomNumber}）',
+              style: const TextStyle(color: Colors.red)),
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(color: Colors.red),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+          ),
+        ),
+      );
+    } else {
+      return SizedBox(
+        width: double.infinity,
+        child: FilledButton.icon(
+          onPressed: () async {
+            final result = await Navigator.push<bool>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MoveInScreen(
+                  tenantId: widget.tenantId,
+                  tenantName: _tenant!.name,
+                ),
+              ),
+            );
+            if (result == true) _loadDetail();
+          },
+          icon: const Icon(Icons.login),
+          label: const Text('辦理入住'),
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleMoveOut(LeaseHistory lease) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('確認退房'),
+        content: Text('確定要讓「${_tenant!.name}」從 ${lease.floor}F ${lease.roomNumber} 退房嗎？'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('取消')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('確認退房', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    try {
+      await LeaseService.moveOut(lease.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('退房成功'), backgroundColor: Colors.green),
+        );
+        _loadDetail();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
     }
   }
 
@@ -138,6 +226,10 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
                             ),
                           ),
                         ),
+
+                        // Move-in / Move-out action (T-22)
+                        const SizedBox(height: 16),
+                        _buildLeaseAction(),
 
                         // Lease history (T-24)
                         const SizedBox(height: 24),

@@ -31,6 +31,11 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFF2563EB),
         ),
         useMaterial3: true,
+        appBarTheme: AppBarTheme(
+          scrolledUnderElevation: 0,
+          backgroundColor: ColorScheme.fromSeed(seedColor: const Color(0xFF2563EB)).surface,
+          surfaceTintColor: Colors.transparent,
+        ),
       ),
       home: const AuthGate(),
     );

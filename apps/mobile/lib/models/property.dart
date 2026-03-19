@@ -18,6 +18,7 @@ class Property {
   final int floor;
   final String roomNumber;
   final double area;
+  final int monthlyRent;
   final PropertyStatus status;
   final List<String> facilities;
   final DateTime createdAt;
@@ -29,6 +30,7 @@ class Property {
     required this.floor,
     required this.roomNumber,
     required this.area,
+    required this.monthlyRent,
     required this.status,
     required this.facilities,
     required this.createdAt,
@@ -42,6 +44,7 @@ class Property {
       floor: json['floor'],
       roomNumber: json['roomNumber'],
       area: (json['area'] as num).toDouble(),
+      monthlyRent: json['monthlyRent'] ?? 0,
       status: PropertyStatus.fromString(json['status']),
       facilities: List<String>.from(json['facilities'] ?? []),
       createdAt: DateTime.parse(json['createdAt']),
@@ -59,6 +62,7 @@ class PropertyDetail extends Property {
     required super.floor,
     required super.roomNumber,
     required super.area,
+    required super.monthlyRent,
     required super.status,
     required super.facilities,
     required super.createdAt,
@@ -78,6 +82,7 @@ class PropertyDetail extends Property {
       floor: json['floor'],
       roomNumber: json['roomNumber'],
       area: (json['area'] as num).toDouble(),
+      monthlyRent: json['monthlyRent'] ?? 0,
       status: PropertyStatus.fromString(json['status']),
       facilities: List<String>.from(json['facilities'] ?? []),
       createdAt: DateTime.parse(json['createdAt']),

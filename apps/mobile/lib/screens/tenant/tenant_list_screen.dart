@@ -10,12 +10,14 @@ class TenantListScreen extends StatefulWidget {
   const TenantListScreen({super.key});
 
   @override
-  State<TenantListScreen> createState() => _TenantListScreenState();
+  State<TenantListScreen> createState() => TenantListScreenState();
 }
 
-class _TenantListScreenState extends State<TenantListScreen> {
+class TenantListScreenState extends State<TenantListScreen> {
+  void refresh() => _loadTenants();
   List<Tenant> _tenants = [];
   bool _loading = true;
+  bool _initialized = false;
   String? _error;
   final _searchController = TextEditingController();
   Timer? _debounce;
@@ -41,10 +43,9 @@ class _TenantListScreenState extends State<TenantListScreen> {
   }
 
   Future<void> _loadTenants() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
+    if (!_initialized) {
+      setState(() { _loading = true; _error = null; });
+    }
     try {
       final search = _searchController.text.trim();
       final result = await TenantService.list(
@@ -53,10 +54,11 @@ class _TenantListScreenState extends State<TenantListScreen> {
       setState(() {
         _tenants = result.data;
         _loading = false;
+        _initialized = true;
       });
     } catch (e) {
       setState(() {
-        _error = e.toString();
+        if (!_initialized) _error = e.toString();
         _loading = false;
       });
     }
@@ -94,9 +96,6 @@ class _TenantListScreenState extends State<TenantListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('租客管理'),
-      ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'tenant_fab',
         onPressed: () async {
