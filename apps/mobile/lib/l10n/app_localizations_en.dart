@@ -198,9 +198,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusMaintenance => 'Maintenance';
 
   @override
-  String get statusArchived => 'Archived';
-
-  @override
   String get leaseActive => 'Active';
 
   @override
@@ -557,6 +554,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String propertyDropdownItem(int floor, String room, String area) {
     return '${floor}F $room ($area ping)';
+  }
+
+  @override
+  String get floorPlanView => 'Floor Plan';
+
+  @override
+  String get listView => 'List';
+
+  @override
+  String floorLabel(int floor) {
+    return '${floor}F';
   }
 
   @override

@@ -54,11 +54,6 @@ class PropertyService {
     await ApiService.delete('/api/properties/$id');
   }
 
-  static Future<Property> archive(String id) async {
-    final res = await ApiService.patch('/api/properties/$id/archive');
-    return Property.fromJson(res);
-  }
-
   static Future<PropertyDetail> getDetail(String id) async {
     final res = await ApiService.get('/api/properties/$id');
     return PropertyDetail.fromJson(res);

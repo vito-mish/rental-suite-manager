@@ -1,8 +1,7 @@
 enum PropertyStatus {
   vacant('VACANT'),
   occupied('OCCUPIED'),
-  maintenance('MAINTENANCE'),
-  archived('ARCHIVED');
+  maintenance('MAINTENANCE');
 
   const PropertyStatus(this.value);
   final String value;

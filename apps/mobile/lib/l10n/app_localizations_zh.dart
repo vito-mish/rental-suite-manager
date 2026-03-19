@@ -190,9 +190,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statusMaintenance => '維修中';
 
   @override
-  String get statusArchived => '已封存';
-
-  @override
   String get leaseActive => '進行中';
 
   @override
@@ -548,6 +545,17 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String propertyDropdownItem(int floor, String room, String area) {
     return '${floor}F $room（$area 坪）';
+  }
+
+  @override
+  String get floorPlanView => '樓層圖';
+
+  @override
+  String get listView => '列表';
+
+  @override
+  String floorLabel(int floor) {
+    return '${floor}F';
   }
 
   @override
@@ -748,9 +756,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get statusMaintenance => '維修中';
 
   @override
-  String get statusArchived => '已封存';
-
-  @override
   String get leaseActive => '進行中';
 
   @override
@@ -1106,6 +1111,17 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String propertyDropdownItem(int floor, String room, String area) {
     return '${floor}F $room（$area 坪）';
+  }
+
+  @override
+  String get floorPlanView => '樓層圖';
+
+  @override
+  String get listView => '列表';
+
+  @override
+  String floorLabel(int floor) {
+    return '${floor}F';
   }
 
   @override

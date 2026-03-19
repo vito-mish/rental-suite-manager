@@ -453,12 +453,6 @@ abstract class AppLocalizations {
   /// **'維修中'**
   String get statusMaintenance;
 
-  /// No description provided for @statusArchived.
-  ///
-  /// In zh_TW, this message translates to:
-  /// **'已封存'**
-  String get statusArchived;
-
   /// No description provided for @leaseActive.
   ///
   /// In zh_TW, this message translates to:
@@ -1106,6 +1100,24 @@ abstract class AppLocalizations {
   /// In zh_TW, this message translates to:
   /// **'{floor}F {room}（{area} 坪）'**
   String propertyDropdownItem(int floor, String room, String area);
+
+  /// No description provided for @floorPlanView.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'樓層圖'**
+  String get floorPlanView;
+
+  /// No description provided for @listView.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'列表'**
+  String get listView;
+
+  /// No description provided for @floorLabel.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'{floor}F'**
+  String floorLabel(int floor);
 
   /// No description provided for @operationFailed.
   ///

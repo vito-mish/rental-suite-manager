@@ -5,6 +5,7 @@ import '../../l10n/l10n_helper.dart';
 import '../../models/property.dart';
 import '../../services/property_service.dart';
 import '../../widgets/property_card.dart';
+import '../../widgets/floor_plan_view.dart';
 import 'property_form_screen.dart';
 import 'property_detail_screen.dart';
 
@@ -22,6 +23,7 @@ class PropertyListScreenState extends State<PropertyListScreen> {
   bool _initialized = false;
   String? _error;
   PropertyStatus? _statusFilter;
+  bool _showFloorPlan = false;
   final _searchController = TextEditingController();
   Timer? _debounce;
 
@@ -116,24 +118,36 @@ class PropertyListScreenState extends State<PropertyListScreen> {
       ),
       body: Column(
         children: [
-          // Search bar
+          // Search bar + view toggle
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-            child: TextField(
-              controller: _searchController,
-              onChanged: _onSearchChanged,
-              decoration: InputDecoration(
-                hintText: l10n.searchPropertyHint,
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () { _searchController.clear(); _loadProperties(); },
-                      )
-                    : null,
-              ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: _onSearchChanged,
+                    decoration: InputDecoration(
+                      hintText: l10n.searchPropertyHint,
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () { _searchController.clear(); _loadProperties(); },
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  tooltip: _showFloorPlan ? l10n.listView : l10n.floorPlanView,
+                  icon: Icon(_showFloorPlan ? Icons.view_list : Icons.grid_view),
+                  onPressed: () => setState(() => _showFloorPlan = !_showFloorPlan),
+                ),
+              ],
             ),
           ),
           // Status filter
@@ -150,7 +164,7 @@ class PropertyListScreenState extends State<PropertyListScreen> {
                     _loadProperties();
                   },
                 ),
-                ...PropertyStatus.values.where((s) => s != PropertyStatus.archived).map((s) => _FilterChip(
+                ...PropertyStatus.values.map((s) => _FilterChip(
                       label: localizePropertyStatus(l10n, s.value),
                       selected: _statusFilter == s,
                       onSelected: () {
@@ -161,7 +175,7 @@ class PropertyListScreenState extends State<PropertyListScreen> {
               ],
             ),
           ),
-          // Property list
+          // Property list / floor plan
           Expanded(
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
@@ -176,51 +190,64 @@ class PropertyListScreenState extends State<PropertyListScreen> {
                           ],
                         ),
                       )
-                    : _properties.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.apartment, size: 64, color: Colors.grey[300]),
-                                const SizedBox(height: 16),
-                                Text(l10n.noProperties, style: TextStyle(color: Colors.grey[500], fontSize: 16)),
-                                const SizedBox(height: 8),
-                                Text(l10n.addPropertyHint),
-                              ],
-                            ),
+                    : _showFloorPlan
+                        ? FloorPlanView(
+                            properties: _properties,
+                            onPropertyTap: (property) async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => PropertyDetailScreen(propertyId: property.id),
+                                ),
+                              );
+                              _loadProperties();
+                            },
                           )
-                        : RefreshIndicator(
-                            onRefresh: _loadProperties,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.only(bottom: 80),
-                              itemCount: _properties.length,
-                              itemBuilder: (context, index) {
-                                final property = _properties[index];
-                                return PropertyCard(
-                                  property: property,
-                                  onTap: () async {
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => PropertyDetailScreen(propertyId: property.id),
-                                      ),
+                        : _properties.isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.apartment, size: 64, color: Colors.grey[300]),
+                                    const SizedBox(height: 16),
+                                    Text(l10n.noProperties, style: TextStyle(color: Colors.grey[500], fontSize: 16)),
+                                    const SizedBox(height: 8),
+                                    Text(l10n.addPropertyHint),
+                                  ],
+                                ),
+                              )
+                            : RefreshIndicator(
+                                onRefresh: _loadProperties,
+                                child: ListView.builder(
+                                  padding: const EdgeInsets.only(bottom: 80),
+                                  itemCount: _properties.length,
+                                  itemBuilder: (context, index) {
+                                    final property = _properties[index];
+                                    return PropertyCard(
+                                      property: property,
+                                      onTap: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => PropertyDetailScreen(propertyId: property.id),
+                                          ),
+                                        );
+                                        _loadProperties();
+                                      },
+                                      onEdit: () async {
+                                        final result = await Navigator.push<bool>(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => PropertyFormScreen(property: property),
+                                          ),
+                                        );
+                                        if (result == true) _loadProperties();
+                                      },
+                                      onDelete: () => _deleteProperty(property),
                                     );
-                                    _loadProperties();
                                   },
-                                  onEdit: () async {
-                                    final result = await Navigator.push<bool>(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => PropertyFormScreen(property: property),
-                                      ),
-                                    );
-                                    if (result == true) _loadProperties();
-                                  },
-                                  onDelete: () => _deleteProperty(property),
-                                );
-                              },
-                            ),
-                          ),
+                                ),
+                              ),
           ),
         ],
       ),

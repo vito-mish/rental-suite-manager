@@ -25,8 +25,6 @@ class PropertyCard extends StatelessWidget {
         return Colors.blue;
       case PropertyStatus.maintenance:
         return Colors.orange;
-      case PropertyStatus.archived:
-        return Colors.grey;
     }
   }
 

@@ -76,7 +76,6 @@
   "statusVacant": "空房",
   "statusOccupied": "出租中",
   "statusMaintenance": "維修中",
-  "statusArchived": "已封存",
 
   "leaseActive": "進行中",
   "leaseExpired": "已到期",
@@ -286,6 +285,15 @@
       "floor": {"type": "int"},
       "room": {"type": "String"},
       "area": {"type": "String"}
+    }
+  },
+
+  "floorPlanView": "樓層圖",
+  "listView": "列表",
+  "floorLabel": "{floor}F",
+  "@floorLabel": {
+    "placeholders": {
+      "floor": {"type": "int"}
     }
   },
 

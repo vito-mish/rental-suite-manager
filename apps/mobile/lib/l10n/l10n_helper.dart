@@ -13,8 +13,6 @@ String localizePropertyStatus(AppLocalizations l10n, String value) {
       return l10n.statusOccupied;
     case 'MAINTENANCE':
       return l10n.statusMaintenance;
-    case 'ARCHIVED':
-      return l10n.statusArchived;
     default:
       return value;
   }

@@ -66,7 +66,6 @@
   "statusVacant": "Vacant",
   "statusOccupied": "Occupied",
   "statusMaintenance": "Maintenance",
-  "statusArchived": "Archived",
 
   "leaseActive": "Active",
   "leaseExpired": "Expired",
@@ -188,6 +187,15 @@
   "periodCount": "{paid}/{total} periods",
   "rentPerMonth": "{amount}/mo",
   "propertyDropdownItem": "{floor}F {room} ({area} ping)",
+
+  "floorPlanView": "Floor Plan",
+  "listView": "List",
+  "floorLabel": "{floor}F",
+  "@floorLabel": {
+    "placeholders": {
+      "floor": {"type": "int"}
+    }
+  },
 
   "operationFailed": "Operation failed",
   "deleteFailed": "Delete failed",

@@ -52,8 +52,6 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
         return Colors.blue;
       case PropertyStatus.maintenance:
         return Colors.orange;
-      case PropertyStatus.archived:
-        return Colors.grey;
     }
   }
 
