@@ -62,10 +62,14 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>> patch(String path) async {
+  static Future<Map<String, dynamic>> patch(String path, [Map<String, dynamic>? body]) async {
     final uri = Uri.parse('$_baseUrl$path');
     debugPrint('[API] PATCH $uri');
-    final res = await http.patch(uri, headers: _authOnlyHeaders);
+    final res = await http.patch(
+      uri,
+      headers: body != null ? _headers : _authOnlyHeaders,
+      body: body != null ? jsonEncode(body) : null,
+    );
     debugPrint('[API] PATCH response: ${res.statusCode} ${res.body}');
     return _handleResponse(res);
   }

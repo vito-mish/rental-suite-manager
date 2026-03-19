@@ -3,6 +3,8 @@ import '../main.dart';
 import 'property/property_list_screen.dart';
 import 'tenant/tenant_list_screen.dart';
 import 'lease/lease_list_screen.dart';
+import 'payment/payment_list_screen.dart';
+import 'payment/payment_report_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,8 +19,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final _propertyKey = GlobalKey<PropertyListScreenState>();
   final _tenantKey = GlobalKey<TenantListScreenState>();
   final _leaseKey = GlobalKey<LeaseListScreenState>();
+  final _paymentKey = GlobalKey<PaymentListScreenState>();
 
   late final List<Widget> _screens;
+
+  static const _titles = ['房源管理', '租客管理', '租約管理', '收租管理'];
 
   @override
   void initState() {
@@ -27,12 +32,12 @@ class _HomeScreenState extends State<HomeScreen> {
       PropertyListScreen(key: _propertyKey),
       TenantListScreen(key: _tenantKey),
       LeaseListScreen(key: _leaseKey),
+      PaymentListScreen(key: _paymentKey),
     ];
   }
 
   void _onTabChanged(int index) {
     setState(() => _currentIndex = index);
-    // Refresh the target tab
     switch (index) {
       case 0:
         _propertyKey.currentState?.refresh();
@@ -40,6 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
         _tenantKey.currentState?.refresh();
       case 2:
         _leaseKey.currentState?.refresh();
+      case 3:
+        _paymentKey.currentState?.refresh();
     }
   }
 
@@ -49,8 +56,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(['房源管理', '租客管理', '租約管理'][_currentIndex]),
+        title: Text(_titles[_currentIndex]),
         actions: [
+          if (_currentIndex == 3)
+            IconButton(
+              icon: const Icon(Icons.bar_chart),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PaymentReportScreen()),
+                );
+              },
+            ),
           Padding(
             padding: const EdgeInsets.only(right: 8),
             child: Text(
@@ -88,6 +105,11 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.description_outlined),
             selectedIcon: Icon(Icons.description),
             label: '租約',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.payments_outlined),
+            selectedIcon: Icon(Icons.payments),
+            label: '收租',
           ),
         ],
       ),

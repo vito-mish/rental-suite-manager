@@ -21,6 +21,7 @@ export const updateLeaseSchema = z.object({
 
 export const listLeaseQuerySchema = z.object({
   status: LeaseStatus.optional(),
+  search: z.string().optional(),
   propertyId: z.string().optional(),
   tenantId: z.string().optional(),
   sort: z.enum(['startDate', 'endDate', 'createdAt', 'monthlyRent']).optional().default('createdAt'),

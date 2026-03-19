@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../models/property.dart';
 import '../../services/property_service.dart';
@@ -19,6 +20,8 @@ class PropertyListScreenState extends State<PropertyListScreen> {
   bool _initialized = false;
   String? _error;
   PropertyStatus? _statusFilter;
+  final _searchController = TextEditingController();
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -26,12 +29,30 @@ class PropertyListScreenState extends State<PropertyListScreen> {
     _loadProperties();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      _loadProperties();
+    });
+  }
+
   Future<void> _loadProperties() async {
     if (!_initialized) {
       setState(() { _loading = true; _error = null; });
     }
     try {
-      final result = await PropertyService.list(status: _statusFilter);
+      final search = _searchController.text.trim();
+      final result = await PropertyService.list(
+        status: _statusFilter,
+        search: search.isNotEmpty ? search : null,
+      );
       setState(() {
         _properties = result.data;
         _loading = false;
@@ -90,6 +111,26 @@ class PropertyListScreenState extends State<PropertyListScreen> {
       ),
       body: Column(
         children: [
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _onSearchChanged,
+              decoration: InputDecoration(
+                hintText: '搜尋房號或租客姓名',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () { _searchController.clear(); _loadProperties(); },
+                      )
+                    : null,
+              ),
+            ),
+          ),
           // Status filter
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,

@@ -55,6 +55,84 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
     }
   }
 
+  String _fmtDate(DateTime d) => '${d.year}/${d.month.toString().padLeft(2, '0')}/${d.day.toString().padLeft(2, '0')}';
+
+  Widget _buildLeaseSection(ActiveLease lease) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _InfoRow(icon: Icons.person, label: '租客', value: lease.tenant.name),
+                _InfoRow(icon: Icons.phone, label: '電話', value: lease.tenant.phone),
+                if (lease.tenant.email != null)
+                  _InfoRow(icon: Icons.email, label: 'Email', value: lease.tenant.email!),
+                _InfoRow(
+                  icon: Icons.calendar_today,
+                  label: '租期',
+                  value: '${_fmtDate(lease.startDate)} ~ ${_fmtDate(lease.endDate)}',
+                ),
+                _InfoRow(icon: Icons.attach_money, label: '月租', value: 'NT\$ ${lease.monthlyRent}'),
+                _InfoRow(
+                  icon: Icons.timer,
+                  label: '使用期效',
+                  value: _fmtDate(lease.validUntil),
+                ),
+              ],
+            ),
+          ),
+        ),
+        // Validity warning
+        if (lease.isExpired)
+          Container(
+            margin: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.red.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  '使用期效已過期，請催繳租金',
+                  style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          ),
+        // Payment history
+        const SizedBox(height: 24),
+        Text('繳款紀錄 (${lease.paidCount}/${lease.payments.length})', style: Theme.of(context).textTheme.titleSmall),
+        const SizedBox(height: 8),
+        ...lease.payments.map((p) => Card(
+              margin: const EdgeInsets.only(bottom: 4),
+              child: ListTile(
+                dense: true,
+                leading: Icon(
+                  p.status == 'PAID' ? Icons.check_circle : p.status == 'OVERDUE' ? Icons.error : Icons.schedule,
+                  color: p.status == 'PAID' ? Colors.green : p.status == 'OVERDUE' ? Colors.red : Colors.orange,
+                  size: 20,
+                ),
+                title: Text('NT\$ ${p.amount}'),
+                subtitle: Text('到期 ${_fmtDate(p.dueDate)}'),
+                trailing: Text(
+                  p.status == 'PAID' ? '${p.statusLabel} ${_fmtDate(p.paidDate!)}' : p.statusLabel,
+                  style: TextStyle(
+                    color: p.status == 'PAID' ? Colors.green : p.status == 'OVERDUE' ? Colors.red : Colors.orange,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            )),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -141,49 +219,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                       const SizedBox(height: 24),
                       Text('租約狀態', style: Theme.of(context).textTheme.titleSmall),
                       const SizedBox(height: 8),
-                      _property!.activeLease != null
-                          ? Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  children: [
-                                    _InfoRow(
-                                      icon: Icons.person,
-                                      label: '租客',
-                                      value: _property!.activeLease!.tenant.name,
-                                    ),
-                                    _InfoRow(
-                                      icon: Icons.phone,
-                                      label: '電話',
-                                      value: _property!.activeLease!.tenant.phone,
-                                    ),
-                                    if (_property!.activeLease!.tenant.email != null)
-                                      _InfoRow(
-                                        icon: Icons.email,
-                                        label: 'Email',
-                                        value: _property!.activeLease!.tenant.email!,
-                                      ),
-                                    _InfoRow(
-                                      icon: Icons.calendar_today,
-                                      label: '租期',
-                                      value:
-                                          '${_property!.activeLease!.startDate.toString().substring(0, 10)} ~ ${_property!.activeLease!.endDate.toString().substring(0, 10)}',
-                                    ),
-                                    _InfoRow(
-                                      icon: Icons.attach_money,
-                                      label: '月租',
-                                      value: 'NT\$ ${_property!.activeLease!.monthlyRent}',
-                                    ),
-                                    _InfoRow(
-                                      icon: Icons.timer,
-                                      label: '剩餘天數',
-                                      value:
-                                          '${_property!.activeLease!.endDate.difference(DateTime.now()).inDays} 天',
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
+                      _property!.activeLeaseDetail != null
+                          ? _buildLeaseSection(_property!.activeLeaseDetail!)
                           : Card(
                               child: Padding(
                                 padding: const EdgeInsets.all(24),

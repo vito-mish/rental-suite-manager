@@ -35,12 +35,19 @@ export default async function propertyRoutes(fastify: FastifyInstance) {
       return reply.status(400).send({ error: parsed.error.flatten() });
     }
 
-    const { status, floor, sort, order, page, limit } = parsed.data;
+    const { status, search, floor, sort, order, page, limit } = parsed.data;
 
     const where = {
       userId: request.userId,
       ...(status && { status }),
       ...(floor !== undefined && { floor }),
+      ...(search && {
+        OR: [
+          { roomNumber: { contains: search, mode: 'insensitive' as const } },
+          { name: { contains: search, mode: 'insensitive' as const } },
+          { leases: { some: { status: 'ACTIVE' as const, tenant: { name: { contains: search, mode: 'insensitive' as const } } } } },
+        ],
+      }),
     };
 
     const [data, total] = await Promise.all([
@@ -49,11 +56,44 @@ export default async function propertyRoutes(fastify: FastifyInstance) {
         orderBy: { [sort]: order },
         skip: (page - 1) * limit,
         take: limit,
+        include: {
+          leases: {
+            where: { status: 'ACTIVE' },
+            include: {
+              tenant: { select: { id: true, name: true, phone: true } },
+              payments: { select: { id: true, status: true, dueDate: true, amount: true, paidDate: true } },
+            },
+            take: 1,
+          },
+        },
       }),
       prisma.property.count({ where }),
     ]);
 
-    return reply.send({ data, total, page, limit });
+    // Compute validity for each property
+    const enriched = data.map((p) => {
+      const lease = p.leases[0];
+      if (!lease) return { ...p, leases: undefined, activeLease: null };
+      const paidCount = lease.payments.filter((pay) => pay.status === 'PAID').length;
+      const start = new Date(lease.startDate);
+      const validUntil = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + paidCount, start.getUTCDate() - 1));
+      return {
+        ...p,
+        leases: undefined,
+        activeLease: {
+          id: lease.id,
+          tenant: lease.tenant,
+          startDate: lease.startDate,
+          endDate: lease.endDate,
+          monthlyRent: lease.monthlyRent,
+          paidCount,
+          totalPayments: lease.payments.length,
+          validUntil,
+        },
+      };
+    });
+
+    return reply.send({ data: enriched, total, page, limit });
   });
 
   // Get property detail
@@ -63,7 +103,10 @@ export default async function propertyRoutes(fastify: FastifyInstance) {
       include: {
         leases: {
           where: { status: 'ACTIVE' },
-          include: { tenant: true },
+          include: {
+            tenant: true,
+            payments: { orderBy: { dueDate: 'asc' } },
+          },
           take: 1,
         },
       },

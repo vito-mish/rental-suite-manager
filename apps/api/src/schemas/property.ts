@@ -16,6 +16,7 @@ export const updatePropertySchema = createPropertySchema.partial();
 
 export const listPropertyQuerySchema = z.object({
   status: PropertyStatus.optional(),
+  search: z.string().optional(),
   floor: z.coerce.number().int().optional(),
   sort: z.enum(['name', 'floor', 'roomNumber', 'area', 'createdAt']).optional().default('createdAt'),
   order: z.enum(['asc', 'desc']).optional().default('desc'),

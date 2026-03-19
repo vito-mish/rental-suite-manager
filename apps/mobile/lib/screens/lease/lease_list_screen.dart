@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../models/lease.dart';
 import '../../services/lease_service.dart';
@@ -16,6 +17,8 @@ class LeaseListScreenState extends State<LeaseListScreen> {
   bool _initialized = false;
   String? _error;
   String? _statusFilter;
+  final _searchController = TextEditingController();
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -23,12 +26,30 @@ class LeaseListScreenState extends State<LeaseListScreen> {
     _loadLeases();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      _loadLeases();
+    });
+  }
+
   Future<void> _loadLeases() async {
     if (!_initialized) {
       setState(() { _loading = true; _error = null; });
     }
     try {
-      final result = await LeaseService.list(status: _statusFilter);
+      final search = _searchController.text.trim();
+      final result = await LeaseService.list(
+        status: _statusFilter,
+        search: search.isNotEmpty ? search : null,
+      );
       setState(() {
         _leases = result.data;
         _loading = false;
@@ -60,6 +81,26 @@ class LeaseListScreenState extends State<LeaseListScreen> {
     return Scaffold(
       body: Column(
         children: [
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _onSearchChanged,
+              decoration: InputDecoration(
+                hintText: '搜尋租客姓名或房號',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () { _searchController.clear(); _loadLeases(); },
+                      )
+                    : null,
+              ),
+            ),
+          ),
           // Status filter
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,

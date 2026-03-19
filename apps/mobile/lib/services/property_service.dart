@@ -4,6 +4,7 @@ import 'api_service.dart';
 class PropertyService {
   static Future<({List<Property> data, int total})> list({
     PropertyStatus? status,
+    String? search,
     int? floor,
     String sort = 'createdAt',
     String order = 'desc',
@@ -17,6 +18,7 @@ class PropertyService {
       'limit': limit.toString(),
     };
     if (status != null) query['status'] = status.value;
+    if (search != null && search.isNotEmpty) query['search'] = search;
     if (floor != null) query['floor'] = floor.toString();
 
     final res = await ApiService.get('/api/properties', query: query);

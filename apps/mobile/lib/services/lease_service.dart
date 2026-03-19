@@ -30,6 +30,7 @@ class LeaseService {
 
   static Future<({List<Lease> data, int total})> list({
     String? status,
+    String? search,
     String? propertyId,
     String? tenantId,
     String sort = 'createdAt',
@@ -44,6 +45,7 @@ class LeaseService {
       'limit': limit.toString(),
     };
     if (status != null) query['status'] = status;
+    if (search != null && search.isNotEmpty) query['search'] = search;
     if (propertyId != null) query['propertyId'] = propertyId;
     if (tenantId != null) query['tenantId'] = tenantId;
 

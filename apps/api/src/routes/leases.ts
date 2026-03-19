@@ -75,6 +75,31 @@ export default async function leaseRoutes(fastify: FastifyInstance) {
         data: { moveInDate: new Date(startDate) },
       });
 
+      // Auto-generate monthly payments for entire lease duration
+      // Due dates align with lease start day (e.g. start 3/19 → due 3/19, 4/19, 5/19...)
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const payments = [];
+      const startDay = start.getUTCDate();
+      let curYear = start.getUTCFullYear();
+      let curMonth = start.getUTCMonth();
+      while (true) {
+        const dueDate = new Date(Date.UTC(curYear, curMonth, startDay));
+        if (dueDate >= end) break;
+        payments.push({
+          leaseId: newLease.id,
+          amount: monthlyRent,
+          dueDate,
+          status: 'PENDING' as const,
+        });
+        curMonth++;
+        if (curMonth >= 12) { curMonth = 0; curYear++; }
+      }
+
+      if (payments.length > 0) {
+        await tx.payment.createMany({ data: payments });
+      }
+
       return newLease;
     });
 
@@ -130,13 +155,19 @@ export default async function leaseRoutes(fastify: FastifyInstance) {
       return reply.status(400).send({ error: parsed.error.flatten() });
     }
 
-    const { status, propertyId, tenantId, sort, order, page, limit } = parsed.data;
+    const { status, search, propertyId, tenantId, sort, order, page, limit } = parsed.data;
 
     const where = {
       property: { userId: request.userId },
       ...(status && { status }),
       ...(propertyId && { propertyId }),
       ...(tenantId && { tenantId }),
+      ...(search && {
+        OR: [
+          { tenant: { name: { contains: search, mode: 'insensitive' as const } } },
+          { property: { roomNumber: { contains: search, mode: 'insensitive' as const } } },
+        ],
+      }),
     };
 
     const [data, total] = await Promise.all([
