@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../main.dart';
 import 'property/property_list_screen.dart';
 import 'tenant/tenant_list_screen.dart';
@@ -23,7 +24,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   late final List<Widget> _screens;
 
-  static const _titles = ['房源管理', '租客管理', '租約管理', '收租管理'];
+  List<String> _titles(AppLocalizations l10n) => [
+        l10n.titlePropertyManagement,
+        l10n.titleTenantManagement,
+        l10n.titleLeaseManagement,
+        l10n.titlePaymentManagement,
+      ];
 
   @override
   void initState() {
@@ -53,10 +59,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final user = supabase.auth.currentUser;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titles[_currentIndex]),
+        title: Text(_titles(l10n)[_currentIndex]),
         actions: [
           if (_currentIndex == 3)
             IconButton(
@@ -68,6 +75,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: () {
+              MyApp.of(context)?.toggleLocale();
+            },
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 8),
             child: Text(
@@ -90,26 +103,26 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: _onTabChanged,
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.apartment_outlined),
-            selectedIcon: Icon(Icons.apartment),
-            label: '房源',
+            icon: const Icon(Icons.apartment_outlined),
+            selectedIcon: const Icon(Icons.apartment),
+            label: l10n.tabProperties,
           ),
           NavigationDestination(
-            icon: Icon(Icons.people_outlined),
-            selectedIcon: Icon(Icons.people),
-            label: '租客',
+            icon: const Icon(Icons.people_outlined),
+            selectedIcon: const Icon(Icons.people),
+            label: l10n.tabTenants,
           ),
           NavigationDestination(
-            icon: Icon(Icons.description_outlined),
-            selectedIcon: Icon(Icons.description),
-            label: '租約',
+            icon: const Icon(Icons.description_outlined),
+            selectedIcon: const Icon(Icons.description),
+            label: l10n.tabLeases,
           ),
           NavigationDestination(
-            icon: Icon(Icons.payments_outlined),
-            selectedIcon: Icon(Icons.payments),
-            label: '收租',
+            icon: const Icon(Icons.payments_outlined),
+            selectedIcon: const Icon(Icons.payments),
+            label: l10n.tabPayments,
           ),
         ],
       ),

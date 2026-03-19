@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
+import '../../l10n/l10n_helper.dart';
 import '../../models/payment.dart';
 import '../../services/payment_service.dart';
 
@@ -68,18 +70,19 @@ class PaymentListScreenState extends State<PaymentListScreen> {
   }
 
   Future<void> _markPaid(Payment payment) async {
+    final l10n = AppLocalizations.of(context)!;
     final method = await showDialog<String>(
       context: context,
       builder: (ctx) => SimpleDialog(
-        title: Text('${payment.lease.property.roomNumber} — 繳費方式'),
+        title: Text(l10n.paymentMethodTitle(payment.lease.property.roomNumber)),
         children: [
           SimpleDialogOption(
             onPressed: () => Navigator.pop(ctx, 'CASH'),
-            child: const ListTile(leading: Icon(Icons.money), title: Text('現金')),
+            child: ListTile(leading: const Icon(Icons.money), title: Text(l10n.methodCash)),
           ),
           SimpleDialogOption(
             onPressed: () => Navigator.pop(ctx, 'TRANSFER'),
-            child: const ListTile(leading: Icon(Icons.account_balance), title: Text('轉帳')),
+            child: ListTile(leading: const Icon(Icons.account_balance), title: Text(l10n.methodTransfer)),
           ),
         ],
       ),
@@ -90,7 +93,7 @@ class PaymentListScreenState extends State<PaymentListScreen> {
       await PaymentService.markPaid(payment.id, method: method);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('已標記繳費'), backgroundColor: Colors.green),
+          SnackBar(content: Text(l10n.markedAsPaid), backgroundColor: Colors.green),
         );
         _loadPayments();
       }
@@ -131,6 +134,8 @@ class PaymentListScreenState extends State<PaymentListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Column(
         children: [
@@ -141,7 +146,7 @@ class PaymentListScreenState extends State<PaymentListScreen> {
               controller: _searchController,
               onChanged: _onSearchChanged,
               decoration: InputDecoration(
-                hintText: '搜尋租客姓名或房號',
+                hintText: l10n.searchPaymentHint,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -185,10 +190,10 @@ class PaymentListScreenState extends State<PaymentListScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                _buildFilterChip('全部', null),
-                _buildFilterChip('待繳', 'PENDING'),
-                _buildFilterChip('已繳', 'PAID'),
-                _buildFilterChip('逾期', 'OVERDUE'),
+                _buildFilterChip(l10n.all, null),
+                _buildFilterChip(l10n.paymentPending, 'PENDING'),
+                _buildFilterChip(l10n.paymentPaid, 'PAID'),
+                _buildFilterChip(l10n.paymentOverdue, 'OVERDUE'),
               ],
             ),
           ),
@@ -204,7 +209,7 @@ class PaymentListScreenState extends State<PaymentListScreen> {
                           children: [
                             Text(_error!, style: const TextStyle(color: Colors.red)),
                             const SizedBox(height: 8),
-                            TextButton(onPressed: _loadPayments, child: const Text('重試')),
+                            TextButton(onPressed: _loadPayments, child: Text(l10n.retry)),
                           ],
                         ),
                       )
@@ -215,9 +220,9 @@ class PaymentListScreenState extends State<PaymentListScreen> {
                               children: [
                                 Icon(Icons.receipt_long_outlined, size: 64, color: Colors.grey[300]),
                                 const SizedBox(height: 16),
-                                Text('本月尚無帳單', style: TextStyle(color: Colors.grey[500], fontSize: 16)),
+                                Text(l10n.noInvoices, style: TextStyle(color: Colors.grey[500], fontSize: 16)),
                                 const SizedBox(height: 8),
-                                const Text('帳單會在辦理入住時自動產生'),
+                                Text(l10n.autoInvoiceHint),
                               ],
                             ),
                           )
@@ -255,7 +260,7 @@ class PaymentListScreenState extends State<PaymentListScreen> {
                                                   borderRadius: BorderRadius.circular(12),
                                                 ),
                                                 child: Text(
-                                                  p.statusLabel,
+                                                  localizePaymentStatus(l10n, p.status),
                                                   style: TextStyle(
                                                     color: _statusColor(p.status),
                                                     fontSize: 12,
@@ -284,7 +289,7 @@ class PaymentListScreenState extends State<PaymentListScreen> {
                                               const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
                                               const SizedBox(width: 4),
                                               Text(
-                                                '到期: ${p.dueDate.toString().substring(0, 10)}',
+                                                l10n.duePrefix(p.dueDate.toString().substring(0, 10)),
                                                 style: TextStyle(color: Colors.grey[600], fontSize: 13),
                                               ),
                                               if (p.status == 'PAID') ...[
@@ -292,14 +297,14 @@ class PaymentListScreenState extends State<PaymentListScreen> {
                                                 Icon(Icons.check_circle, size: 16, color: Colors.green[400]),
                                                 const SizedBox(width: 4),
                                                 Text(
-                                                  '${p.methodLabel} ${p.paidDate?.toString().substring(0, 10) ?? ''}',
+                                                  '${localizePaymentMethod(l10n, p.method)} ${p.paidDate?.toString().substring(0, 10) ?? ''}',
                                                   style: TextStyle(color: Colors.grey[600], fontSize: 13),
                                                 ),
                                               ],
                                               if (p.status != 'PAID') ...[
                                                 const Spacer(),
                                                 Text(
-                                                  '點擊標記繳費',
+                                                  l10n.clickToMarkPaid,
                                                   style: TextStyle(color: Colors.blue[400], fontSize: 12),
                                                 ),
                                               ],

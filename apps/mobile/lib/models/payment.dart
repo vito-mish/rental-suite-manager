@@ -38,29 +38,9 @@ class Payment {
     );
   }
 
-  String get statusLabel {
-    switch (status) {
-      case 'PAID':
-        return '已繳';
-      case 'PENDING':
-        return '待繳';
-      case 'OVERDUE':
-        return '逾期';
-      default:
-        return status;
-    }
-  }
+  String get statusLabel => status;
 
-  String get methodLabel {
-    switch (method) {
-      case 'CASH':
-        return '現金';
-      case 'TRANSFER':
-        return '轉帳';
-      default:
-        return '';
-    }
-  }
+  String get methodLabel => method ?? '';
 }
 
 class PaymentLease {

@@ -1,0 +1,300 @@
+{
+  "@@locale": "zh_TW",
+
+  "tabProperties": "房源",
+  "tabTenants": "租客",
+  "tabLeases": "租約",
+  "tabPayments": "收租",
+
+  "titlePropertyManagement": "房源管理",
+  "titleTenantManagement": "租客管理",
+  "titleLeaseManagement": "租約管理",
+  "titlePaymentManagement": "收租管理",
+
+  "all": "全部",
+  "retry": "重試",
+  "save": "儲存",
+  "add": "新增",
+  "edit": "編輯",
+  "delete": "刪除",
+  "cancel": "取消",
+  "confirm": "確認",
+
+  "login": "登入",
+  "register": "註冊",
+  "password": "密碼",
+  "confirmPassword": "確認密碼",
+  "rememberMe": "記住我",
+  "forgotPasswordLink": "忘記密碼？",
+  "forgotPasswordTitle": "忘記密碼",
+  "noAccount": "還沒有帳號？",
+  "resendVerification": "重寄驗證信",
+  "verificationResent": "驗證信已重新寄出，請檢查 Email",
+  "unknownError": "發生未知錯誤，請稍後再試",
+  "registerSuccess": "註冊成功！請檢查 Email 驗證信。",
+  "resetPasswordSent": "重設密碼信已寄出，請檢查 Email。",
+  "forgotPasswordHint": "輸入你的 Email，我們會寄送重設密碼連結。",
+  "sendResetLink": "寄送重設連結",
+
+  "authInvalidCredentials": "Email 或密碼錯誤，或信箱尚未驗證",
+  "authEmailNotConfirmed": "信箱尚未驗證，請先確認驗證信",
+  "authEmailRegistered": "此 Email 已註冊",
+  "authInvalidPassword": "請輸入有效的密碼",
+  "authPasswordMinLength": "密碼至少需要 6 個字元",
+  "authRateLimit": "請等待 60 秒後再試",
+  "authEmailRateLimit": "Email 發送次數已達上限，請稍後再試",
+  "authEmailError": "Email 相關錯誤：{message}",
+  "@authEmailError": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+  "authGenericError": "發生錯誤：{message}",
+  "@authGenericError": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+
+  "enterEmail": "請輸入 Email",
+  "enterValidEmail": "請輸入有效的 Email",
+  "enterPassword": "請輸入密碼",
+  "passwordMinLength": "密碼至少 6 個字元",
+  "passwordMismatch": "密碼不一致",
+  "enterFloor": "請輸入樓層",
+  "enterInteger": "請輸入整數",
+  "enterRoomNumber": "請輸入房號",
+  "enterArea": "請輸入坪數",
+  "enterValidNumber": "請輸入有效數字",
+  "enterMonthlyRent": "請輸入月租金",
+  "enterValidAmount": "請輸入有效金額",
+  "enterName": "請輸入姓名",
+  "enterPhone": "請輸入手機號碼",
+  "phoneDigits": "手機號碼應為 10 碼",
+  "selectProperty": "請選擇房源",
+
+  "statusVacant": "空房",
+  "statusOccupied": "出租中",
+  "statusMaintenance": "維修中",
+  "statusArchived": "已封存",
+
+  "leaseActive": "進行中",
+  "leaseExpired": "已到期",
+  "leaseTerminated": "已終止",
+
+  "paymentPaid": "已繳",
+  "paymentPending": "待繳",
+  "paymentOverdue": "逾期",
+
+  "methodCash": "現金",
+  "methodTransfer": "轉帳",
+
+  "docIdCard": "身份證",
+  "docContract": "合約",
+  "docOther": "其他",
+
+  "searchPropertyHint": "搜尋房號或租客姓名",
+  "noProperties": "尚無房源",
+  "addPropertyHint": "點擊右下角 + 新增房源",
+  "confirmDeleteTitle": "確認刪除",
+  "confirmDeleteContent": "確定要刪除「{name}」嗎？此操作無法復原。",
+  "@confirmDeleteContent": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "editProperty": "編輯房源",
+  "addProperty": "新增房源",
+  "floor": "樓層",
+  "roomNumber": "房號",
+  "area": "坪數",
+  "areaSuffix": "坪",
+  "monthlyRent": "月租金",
+  "currencySuffix": "元",
+  "facilities": "設施",
+  "propertyDetail": "房源詳情",
+
+  "facilityWifi": "WiFi",
+  "facilityAC": "冷氣",
+  "facilityFridge": "冰箱",
+  "facilityWasher": "洗衣機",
+  "facilityWaterHeater": "熱水器",
+  "facilityTV": "電視",
+  "facilityWardrobe": "衣櫃",
+  "facilityDesk": "書桌",
+  "facilityBed": "床",
+
+  "tenant": "租客",
+  "phoneLabel": "電話",
+  "leasePeriod": "租期",
+  "monthlyRentShort": "月租",
+  "validUntilLabel": "使用期效",
+  "validityExpiredWarning": "使用期效已過期，請催繳租金",
+  "paymentHistoryCount": "繳款紀錄 ({paid}/{total})",
+  "@paymentHistoryCount": {
+    "placeholders": {
+      "paid": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "leaseStatusTitle": "租約狀態",
+  "currentlyVacant": "目前空房",
+  "areaWithUnit": "{area} 坪",
+  "@areaWithUnit": {
+    "placeholders": {
+      "area": {"type": "String"}
+    }
+  },
+
+  "searchTenantHint": "搜尋姓名、手機號碼、Email",
+  "noTenants": "尚無租客",
+  "addTenantHint": "點擊右下角 + 新增租客",
+  "editTenant": "編輯租客",
+  "addTenant": "新增租客",
+  "tenantDetail": "租客詳情",
+  "nameLabel": "姓名",
+  "mobileLabel": "手機",
+  "idCardLabel": "身份證",
+  "moveInDateLabel": "入住日",
+  "moveOutDateLabel": "退房日",
+  "leaseHistory": "租約紀錄",
+  "noLeaseHistory": "尚無租約紀錄",
+  "documents": "文件",
+  "noDocuments": "尚無文件",
+  "moveIn": "辦理入住",
+  "moveOutWithLocation": "退房（{location}）",
+  "@moveOutWithLocation": {
+    "placeholders": {
+      "location": {"type": "String"}
+    }
+  },
+  "confirmMoveOutTitle": "確認退房",
+  "confirmMoveOutContent": "確定要讓「{name}」從 {location} 退房嗎？",
+  "@confirmMoveOutContent": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "location": {"type": "String"}
+    }
+  },
+  "moveOutSuccess": "退房成功",
+  "phoneNumber": "手機號碼",
+  "emailOptional": "Email（選填）",
+  "idNumberOptional": "身份證字號（選填）",
+  "deposit": "押金",
+
+  "moveInTitle": "{name} — 入住",
+  "@moveInTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "loadPropertyFailed": "載入房源失敗: {error}",
+  "@loadPropertyFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "selectPropertyLabel": "選擇房源",
+  "noVacantUnits": "目前沒有空房",
+  "selectVacantUnit": "選擇空房",
+  "leaseInfo": "租約資訊",
+  "startDate": "起租日",
+  "leaseDuration": "租約長度",
+  "leaseMonths": "{count} 個月",
+  "@leaseMonths": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "oneYear": "（一年）",
+  "twoYears": "（二年）",
+  "threeYears": "（三年）",
+  "endDateAuto": "到期日（自動計算）",
+  "depositRentMultiple": "押金（月租 x 2）",
+  "specialTerms": "特殊條款（選填）",
+  "confirmMoveIn": "確認入住",
+
+  "searchLeaseHint": "搜尋租客姓名或房號",
+  "noLeases": "尚無租約",
+  "moveInFromTenantHint": "請從租客詳情頁辦理入住",
+  "remainingDays": "剩餘 {days} 天",
+  "@remainingDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "perMonth": "/月",
+
+  "paymentMethodTitle": "{room} — 繳費方式",
+  "@paymentMethodTitle": {
+    "placeholders": {
+      "room": {"type": "String"}
+    }
+  },
+  "markedAsPaid": "已標記繳費",
+  "searchPaymentHint": "搜尋租客姓名或房號",
+  "noInvoices": "本月尚無帳單",
+  "autoInvoiceHint": "帳單會在辦理入住時自動產生",
+  "clickToMarkPaid": "點擊標記繳費",
+  "duePrefix": "到期: {date}",
+  "@duePrefix": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "dueDate": "到期 {date}",
+  "@dueDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+
+  "monthlyReport": "月收入報表",
+  "expected": "應收",
+  "received": "已收",
+  "roomDetails": "各房間明細",
+  "noInvoicesThisMonth": "本月無帳單",
+
+  "overdueValidUntil": "已逾期 — 使用期效至 {date}",
+  "@overdueValidUntil": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "validUntilDate": "使用期效至 {date}",
+  "@validUntilDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "periodCount": "{paid}/{total} 期",
+  "@periodCount": {
+    "placeholders": {
+      "paid": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "rentPerMonth": "{amount}/月",
+  "@rentPerMonth": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "propertyDropdownItem": "{floor}F {room}（{area} 坪）",
+  "@propertyDropdownItem": {
+    "placeholders": {
+      "floor": {"type": "int"},
+      "room": {"type": "String"},
+      "area": {"type": "String"}
+    }
+  },
+
+  "operationFailed": "操作失敗",
+  "deleteFailed": "刪除失敗",
+  "deleteFailedCode": "刪除失敗 ({code})",
+  "@deleteFailedCode": {
+    "placeholders": {
+      "code": {"type": "int"}
+    }
+  }
+}

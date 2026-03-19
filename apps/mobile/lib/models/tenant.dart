@@ -170,14 +170,5 @@ class TenantDocument {
     );
   }
 
-  String get typeLabel {
-    switch (type) {
-      case 'ID_CARD':
-        return '身份證';
-      case 'CONTRACT':
-        return '合約';
-      default:
-        return '其他';
-    }
-  }
+  String get typeLabel => type;
 }

@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
+import '../../l10n/l10n_helper.dart';
 import '../../models/property.dart';
 import '../../services/property_service.dart';
 import '../../widgets/property_card.dart';
@@ -67,16 +69,17 @@ class PropertyListScreenState extends State<PropertyListScreen> {
   }
 
   Future<void> _deleteProperty(Property property) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('確認刪除'),
-        content: Text('確定要刪除「${property.name}」嗎？此操作無法復原。'),
+        title: Text(l10n.confirmDeleteTitle),
+        content: Text(l10n.confirmDeleteContent(property.name)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('取消')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('刪除', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -97,6 +100,8 @@ class PropertyListScreenState extends State<PropertyListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         heroTag: 'property_fab',
@@ -118,7 +123,7 @@ class PropertyListScreenState extends State<PropertyListScreen> {
               controller: _searchController,
               onChanged: _onSearchChanged,
               decoration: InputDecoration(
-                hintText: '搜尋房號或租客姓名',
+                hintText: l10n.searchPropertyHint,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -138,7 +143,7 @@ class PropertyListScreenState extends State<PropertyListScreen> {
             child: Row(
               children: [
                 _FilterChip(
-                  label: '全部',
+                  label: l10n.all,
                   selected: _statusFilter == null,
                   onSelected: () {
                     setState(() => _statusFilter = null);
@@ -146,7 +151,7 @@ class PropertyListScreenState extends State<PropertyListScreen> {
                   },
                 ),
                 ...PropertyStatus.values.where((s) => s != PropertyStatus.archived).map((s) => _FilterChip(
-                      label: s.label,
+                      label: localizePropertyStatus(l10n, s.value),
                       selected: _statusFilter == s,
                       onSelected: () {
                         setState(() => _statusFilter = s);
@@ -167,7 +172,7 @@ class PropertyListScreenState extends State<PropertyListScreen> {
                           children: [
                             Text(_error!, style: const TextStyle(color: Colors.red)),
                             const SizedBox(height: 8),
-                            TextButton(onPressed: _loadProperties, child: const Text('重試')),
+                            TextButton(onPressed: _loadProperties, child: Text(l10n.retry)),
                           ],
                         ),
                       )
@@ -178,9 +183,9 @@ class PropertyListScreenState extends State<PropertyListScreen> {
                               children: [
                                 Icon(Icons.apartment, size: 64, color: Colors.grey[300]),
                                 const SizedBox(height: 16),
-                                Text('尚無房源', style: TextStyle(color: Colors.grey[500], fontSize: 16)),
+                                Text(l10n.noProperties, style: TextStyle(color: Colors.grey[500], fontSize: 16)),
                                 const SizedBox(height: 8),
-                                const Text('點擊右下角 + 新增房源'),
+                                Text(l10n.addPropertyHint),
                               ],
                             ),
                           )

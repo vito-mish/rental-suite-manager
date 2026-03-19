@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/tenant.dart';
 
 class TenantCard extends StatelessWidget {
@@ -17,6 +18,8 @@ class TenantCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: InkWell(
@@ -83,11 +86,11 @@ class TenantCard extends StatelessWidget {
                       },
                       itemBuilder: (_) => [
                         if (onEdit != null)
-                          const PopupMenuItem(value: 'edit', child: Text('編輯')),
+                          PopupMenuItem(value: 'edit', child: Text(l10n.edit)),
                         if (onDelete != null)
-                          const PopupMenuItem(
+                          PopupMenuItem(
                             value: 'delete',
-                            child: Text('刪除', style: TextStyle(color: Colors.red)),
+                            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
                           ),
                       ],
                     ),

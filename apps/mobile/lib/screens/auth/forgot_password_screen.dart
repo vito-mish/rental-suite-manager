@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../l10n/app_localizations.dart';
 import '../../main.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -29,9 +30,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         _emailController.text.trim(),
       );
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('重設密碼信已寄出，請檢查 Email。'),
+          SnackBar(
+            content: Text(l10n.resetPasswordSent),
             backgroundColor: Colors.green,
           ),
         );
@@ -50,8 +52,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('忘記密碼')),
+      appBar: AppBar(title: Text(l10n.forgotPasswordTitle)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -64,7 +68,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      '輸入你的 Email，我們會寄送重設密碼連結。',
+                      l10n.forgotPasswordHint,
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     const SizedBox(height: 24),
@@ -78,10 +82,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return '請輸入 Email';
+                          return l10n.enterEmail;
                         }
                         if (!value.contains('@')) {
-                          return '請輸入有效的 Email';
+                          return l10n.enterValidEmail;
                         }
                         return null;
                       },
@@ -101,7 +105,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text('寄送重設連結'),
+                          : Text(l10n.sendResetLink),
                     ),
                   ],
                 ),

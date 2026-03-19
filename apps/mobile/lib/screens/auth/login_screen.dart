@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../l10n/app_localizations.dart';
 import '../../main.dart';
 import '../../utils/auth_error.dart';
 import 'register_screen.dart';
@@ -81,14 +82,15 @@ class _LoginScreenState extends State<LoginScreen> {
     } on AuthException catch (e) {
       debugPrint('[Login] AuthException: ${e.statusCode} ${e.message}');
       if (mounted) {
-        final msg = localizeAuthError(e.message);
+        final l10n = AppLocalizations.of(context)!;
+        final msg = localizeAuthError(context, e.message);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(msg),
             backgroundColor: Colors.red,
             action: e.message == 'Invalid login credentials'
                 ? SnackBarAction(
-                    label: '重寄驗證信',
+                    label: l10n.resendVerification,
                     textColor: Colors.white,
                     onPressed: _resendVerification,
                   )
@@ -99,8 +101,9 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       debugPrint('[Login] Unexpected error: $e');
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('發生未知錯誤，請稍後再試'), backgroundColor: Colors.red),
+          SnackBar(content: Text(l10n.unknownError), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -115,9 +118,10 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await supabase.auth.resend(type: OtpType.signup, email: email);
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('驗證信已重新寄出，請檢查 Email'),
+          SnackBar(
+            content: Text(l10n.verificationResent),
             backgroundColor: Colors.green,
           ),
         );
@@ -127,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(localizeAuthError(e.message)),
+            content: Text(localizeAuthError(context, e.message)),
             backgroundColor: Colors.red,
           ),
         );
@@ -137,7 +141,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: () => MyApp.of(context)?.toggleLocale(),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -183,10 +197,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       autofillHints: const [AutofillHints.email],
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return '請輸入 Email';
+                          return l10n.enterEmail;
                         }
                         if (!value.contains('@')) {
-                          return '請輸入有效的 Email';
+                          return l10n.enterValidEmail;
                         }
                         return null;
                       },
@@ -195,7 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextFormField(
                       controller: _passwordController,
                       decoration: InputDecoration(
-                        labelText: '密碼',
+                        labelText: l10n.password,
                         prefixIcon: const Icon(Icons.lock_outlined),
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
@@ -210,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       obscureText: _obscurePassword,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return '請輸入密碼';
+                          return l10n.enterPassword;
                         }
                         return null;
                       },
@@ -224,7 +238,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               value: _rememberMe,
                               onChanged: (v) => setState(() => _rememberMe = v ?? false),
                             ),
-                            const Text('記住我'),
+                            Text(l10n.rememberMe),
                           ],
                         ),
                         TextButton(
@@ -236,7 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             );
                           },
-                          child: const Text('忘記密碼？'),
+                          child: Text(l10n.forgotPasswordLink),
                         ),
                       ],
                     ),
@@ -255,13 +269,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text('登入'),
+                          : Text(l10n.login),
                     ),
                     const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('還沒有帳號？'),
+                        Text(l10n.noAccount),
                         TextButton(
                           onPressed: () {
                             Navigator.push(
@@ -271,7 +285,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             );
                           },
-                          child: const Text('註冊'),
+                          child: Text(l10n.register),
                         ),
                       ],
                     ),

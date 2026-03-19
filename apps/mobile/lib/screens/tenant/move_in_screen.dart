@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/property.dart';
 import '../../services/property_service.dart';
 import '../../services/lease_service.dart';
@@ -57,8 +58,9 @@ class _MoveInScreenState extends State<MoveInScreen> {
     } catch (e) {
       setState(() => _loadingProperties = false);
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('載入房源失敗: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(l10n.loadPropertyFailed(e.toString())), backgroundColor: Colors.red),
         );
       }
     }
@@ -79,8 +81,9 @@ class _MoveInScreenState extends State<MoveInScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedProperty == null) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('請選擇房源'), backgroundColor: Colors.red),
+        SnackBar(content: Text(l10n.selectProperty), backgroundColor: Colors.red),
       );
       return;
     }
@@ -110,10 +113,20 @@ class _MoveInScreenState extends State<MoveInScreen> {
 
   String _formatDate(DateTime d) => '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
+  String _leaseLabel(AppLocalizations l10n, int months) {
+    final base = l10n.leaseMonths(months);
+    if (months == 12) return '$base${l10n.oneYear}';
+    if (months == 24) return '$base${l10n.twoYears}';
+    if (months == 36) return '$base${l10n.threeYears}';
+    return base;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: Text('${widget.tenantName} — 入住')),
+      appBar: AppBar(title: Text(l10n.moveInTitle(widget.tenantName))),
       body: _loadingProperties
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
@@ -125,28 +138,28 @@ class _MoveInScreenState extends State<MoveInScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // Property picker
-                      Text('選擇房源', style: Theme.of(context).textTheme.titleSmall),
+                      Text(l10n.selectPropertyLabel, style: Theme.of(context).textTheme.titleSmall),
                       const SizedBox(height: 8),
                       if (_vacantProperties.isEmpty)
                         Card(
                           child: Padding(
                             padding: const EdgeInsets.all(24),
                             child: Center(
-                              child: Text('目前沒有空房', style: TextStyle(color: Colors.grey[500])),
+                              child: Text(l10n.noVacantUnits, style: TextStyle(color: Colors.grey[500])),
                             ),
                           ),
                         )
                       else
                         DropdownButtonFormField<Property>(
                           initialValue: _selectedProperty,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: '選擇空房',
-                            prefixIcon: Icon(Icons.apartment),
+                          decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            hintText: l10n.selectVacantUnit,
+                            prefixIcon: const Icon(Icons.apartment),
                           ),
                           items: _vacantProperties.map((p) => DropdownMenuItem(
                             value: p,
-                            child: Text('${p.floor}F ${p.roomNumber}（${p.area} 坪）'),
+                            child: Text(l10n.propertyDropdownItem(p.floor, p.roomNumber, '${p.area}')),
                           )).toList(),
                           onChanged: (v) {
                             setState(() => _selectedProperty = v);
@@ -154,21 +167,21 @@ class _MoveInScreenState extends State<MoveInScreen> {
                               _rentController.text = v.monthlyRent.toString();
                             }
                           },
-                          validator: (v) => v == null ? '請選擇房源' : null,
+                          validator: (v) => v == null ? l10n.selectProperty : null,
                         ),
 
                       const SizedBox(height: 24),
-                      Text('租約資訊', style: Theme.of(context).textTheme.titleSmall),
+                      Text(l10n.leaseInfo, style: Theme.of(context).textTheme.titleSmall),
                       const SizedBox(height: 8),
 
                       // Start date
                       InkWell(
                         onTap: _pickStartDate,
                         child: InputDecorator(
-                          decoration: const InputDecoration(
-                            labelText: '起租日',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.calendar_today),
+                          decoration: InputDecoration(
+                            labelText: l10n.startDate,
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.calendar_today),
                           ),
                           child: Text(_formatDate(_startDate)),
                         ),
@@ -179,14 +192,14 @@ class _MoveInScreenState extends State<MoveInScreen> {
                       // Lease duration
                       DropdownButtonFormField<int>(
                         initialValue: _leaseMonths,
-                        decoration: const InputDecoration(
-                          labelText: '租約長度',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.timer),
+                        decoration: InputDecoration(
+                          labelText: l10n.leaseDuration,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.timer),
                         ),
                         items: _leaseOptions.map((m) => DropdownMenuItem(
                           value: m,
-                          child: Text('$m 個月${m == 12 ? '（一年）' : m == 24 ? '（二年）' : m == 36 ? '（三年）' : ''}'),
+                          child: Text(_leaseLabel(l10n, m)),
                         )).toList(),
                         onChanged: (v) {
                           if (v != null) setState(() => _leaseMonths = v);
@@ -197,10 +210,10 @@ class _MoveInScreenState extends State<MoveInScreen> {
 
                       // End date (computed, read-only)
                       InputDecorator(
-                        decoration: const InputDecoration(
-                          labelText: '到期日（自動計算）',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.event),
+                        decoration: InputDecoration(
+                          labelText: l10n.endDateAuto,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.event),
                         ),
                         child: Text(_formatDate(_endDate)),
                       ),
@@ -211,16 +224,16 @@ class _MoveInScreenState extends State<MoveInScreen> {
                           Expanded(
                             child: TextFormField(
                               controller: _rentController,
-                              decoration: const InputDecoration(
-                                labelText: '月租金',
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.attach_money),
-                                suffixText: '元',
+                              decoration: InputDecoration(
+                                labelText: l10n.monthlyRent,
+                                border: const OutlineInputBorder(),
+                                prefixIcon: const Icon(Icons.attach_money),
+                                suffixText: l10n.currencySuffix,
                               ),
                               keyboardType: TextInputType.number,
                               validator: (v) {
-                                if (v == null || v.isEmpty) return '請輸入月租金';
-                                if (int.tryParse(v) == null) return '請輸入整數';
+                                if (v == null || v.isEmpty) return l10n.enterMonthlyRent;
+                                if (int.tryParse(v) == null) return l10n.enterInteger;
                                 return null;
                               },
                             ),
@@ -228,11 +241,11 @@ class _MoveInScreenState extends State<MoveInScreen> {
                           const SizedBox(width: 16),
                           Expanded(
                             child: InputDecorator(
-                              decoration: const InputDecoration(
-                                labelText: '押金（月租 x 2）',
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.account_balance_wallet),
-                                suffixText: '元',
+                              decoration: InputDecoration(
+                                labelText: l10n.depositRentMultiple,
+                                border: const OutlineInputBorder(),
+                                prefixIcon: const Icon(Icons.account_balance_wallet),
+                                suffixText: l10n.currencySuffix,
                               ),
                               child: Text(
                                 _rentController.text.isNotEmpty
@@ -247,10 +260,10 @@ class _MoveInScreenState extends State<MoveInScreen> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _termsController,
-                        decoration: const InputDecoration(
-                          labelText: '特殊條款（選填）',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.description),
+                        decoration: InputDecoration(
+                          labelText: l10n.specialTerms,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.description),
                         ),
                         maxLines: 3,
                       ),
@@ -267,7 +280,7 @@ class _MoveInScreenState extends State<MoveInScreen> {
                                 width: 20,
                                 child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                               )
-                            : const Text('確認入住'),
+                            : Text(l10n.confirmMoveIn),
                       ),
                     ],
                   ),

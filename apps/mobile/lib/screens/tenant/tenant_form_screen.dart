@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/tenant.dart';
 import '../../services/tenant_service.dart';
 
@@ -81,9 +82,11 @@ class _TenantFormScreenState extends State<TenantFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isEditing ? '編輯租客' : '新增租客'),
+        title: Text(widget.isEditing ? l10n.editTenant : l10n.addTenant),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -95,48 +98,48 @@ class _TenantFormScreenState extends State<TenantFormScreen> {
               children: [
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: '姓名',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
+                  decoration: InputDecoration(
+                    labelText: l10n.nameLabel,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.person),
                   ),
-                  validator: (v) => v == null || v.trim().isEmpty ? '請輸入姓名' : null,
+                  validator: (v) => v == null || v.trim().isEmpty ? l10n.enterName : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _phoneController,
-                  decoration: const InputDecoration(
-                    labelText: '手機號碼',
+                  decoration: InputDecoration(
+                    labelText: l10n.phoneNumber,
                     hintText: '0933-221-389',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.phone),
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.phone),
                   ),
                   keyboardType: TextInputType.phone,
                   inputFormatters: [_PhoneFormatter()],
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return '請輸入手機號碼';
+                    if (v == null || v.trim().isEmpty) return l10n.enterPhone;
                     final digits = v.replaceAll(RegExp(r'[^0-9]'), '');
-                    if (digits.length != 10) return '手機號碼應為 10 碼';
+                    if (digits.length != 10) return l10n.phoneDigits;
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email（選填）',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
+                  decoration: InputDecoration(
+                    labelText: l10n.emailOptional,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.email),
                   ),
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _idNumberController,
-                  decoration: const InputDecoration(
-                    labelText: '身份證字號（選填）',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.badge),
+                  decoration: InputDecoration(
+                    labelText: l10n.idNumberOptional,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.badge),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -151,7 +154,7 @@ class _TenantFormScreenState extends State<TenantFormScreen> {
                           width: 20,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
-                      : Text(widget.isEditing ? '儲存' : '新增'),
+                      : Text(widget.isEditing ? l10n.save : l10n.add),
                 ),
               ],
             ),
@@ -162,7 +165,7 @@ class _TenantFormScreenState extends State<TenantFormScreen> {
   }
 }
 
-/// Auto-formats phone input: 0933221389 → 0933-221-389
+/// Auto-formats phone input: 0933221389 -> 0933-221-389
 class _PhoneFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(

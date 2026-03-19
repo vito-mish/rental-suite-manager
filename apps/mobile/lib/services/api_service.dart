@@ -56,9 +56,9 @@ class ApiService {
     if (res.statusCode != 204) {
       if (res.body.isNotEmpty) {
         final data = jsonDecode(res.body);
-        throw ApiException(data['error']?.toString() ?? '操作失敗');
+        throw ApiException(data['error']?.toString() ?? 'Operation failed');
       }
-      throw ApiException('刪除失敗 (${res.statusCode})');
+      throw ApiException('Delete failed (${res.statusCode})');
     }
   }
 
@@ -78,7 +78,7 @@ class ApiService {
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (res.statusCode >= 400) {
       final error = data['error'];
-      final msg = error is String ? error : '操作失敗';
+      final msg = error is String ? error : 'Operation failed';
       throw ApiException(msg, statusCode: res.statusCode);
     }
     return data;

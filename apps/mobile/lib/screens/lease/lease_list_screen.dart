@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
+import '../../l10n/l10n_helper.dart';
 import '../../models/lease.dart';
 import '../../services/lease_service.dart';
 
@@ -78,6 +80,8 @@ class LeaseListScreenState extends State<LeaseListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Column(
         children: [
@@ -88,7 +92,7 @@ class LeaseListScreenState extends State<LeaseListScreen> {
               controller: _searchController,
               onChanged: _onSearchChanged,
               decoration: InputDecoration(
-                hintText: '搜尋租客姓名或房號',
+                hintText: l10n.searchLeaseHint,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -107,10 +111,10 @@ class LeaseListScreenState extends State<LeaseListScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                _buildFilterChip('全部', null),
-                _buildFilterChip('進行中', 'ACTIVE'),
-                _buildFilterChip('已到期', 'EXPIRED'),
-                _buildFilterChip('已終止', 'TERMINATED'),
+                _buildFilterChip(l10n.all, null),
+                _buildFilterChip(l10n.leaseActive, 'ACTIVE'),
+                _buildFilterChip(l10n.leaseExpired, 'EXPIRED'),
+                _buildFilterChip(l10n.leaseTerminated, 'TERMINATED'),
               ],
             ),
           ),
@@ -124,7 +128,7 @@ class LeaseListScreenState extends State<LeaseListScreen> {
                           children: [
                             Text(_error!, style: const TextStyle(color: Colors.red)),
                             const SizedBox(height: 8),
-                            TextButton(onPressed: _loadLeases, child: const Text('重試')),
+                            TextButton(onPressed: _loadLeases, child: Text(l10n.retry)),
                           ],
                         ),
                       )
@@ -135,9 +139,9 @@ class LeaseListScreenState extends State<LeaseListScreen> {
                               children: [
                                 Icon(Icons.description_outlined, size: 64, color: Colors.grey[300]),
                                 const SizedBox(height: 16),
-                                Text('尚無租約', style: TextStyle(color: Colors.grey[500], fontSize: 16)),
+                                Text(l10n.noLeases, style: TextStyle(color: Colors.grey[500], fontSize: 16)),
                                 const SizedBox(height: 8),
-                                const Text('請從租客詳情頁辦理入住'),
+                                Text(l10n.moveInFromTenantHint),
                               ],
                             ),
                           )
@@ -172,7 +176,7 @@ class LeaseListScreenState extends State<LeaseListScreen> {
                                                 borderRadius: BorderRadius.circular(12),
                                               ),
                                               child: Text(
-                                                lease.statusLabel,
+                                                localizeLeaseStatus(l10n, lease.status),
                                                 style: TextStyle(
                                                   color: _statusColor(lease.status),
                                                   fontSize: 12,
@@ -210,11 +214,11 @@ class LeaseListScreenState extends State<LeaseListScreen> {
                                           children: [
                                             const Icon(Icons.attach_money, size: 16, color: Colors.grey),
                                             const SizedBox(width: 4),
-                                            Text('NT\$ ${lease.monthlyRent}/月'),
+                                            Text('NT\$ ${lease.monthlyRent}${l10n.perMonth}'),
                                             if (lease.isActive) ...[
                                               const Spacer(),
                                               Text(
-                                                '剩餘 ${lease.remainingDays} 天',
+                                                l10n.remainingDays(lease.remainingDays),
                                                 style: TextStyle(
                                                   color: lease.remainingDays <= 30 ? Colors.orange : Colors.grey[600],
                                                   fontSize: 13,

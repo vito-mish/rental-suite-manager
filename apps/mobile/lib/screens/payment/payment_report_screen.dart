@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/payment.dart';
 import '../../services/payment_service.dart';
 
@@ -44,8 +45,10 @@ class _PaymentReportScreenState extends State<PaymentReportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('月收入報表')),
+      appBar: AppBar(title: Text(l10n.monthlyReport)),
       body: Column(
         children: [
           // Month selector
@@ -73,24 +76,24 @@ class _PaymentReportScreenState extends State<PaymentReportScreen> {
                             // Summary cards
                             Row(
                               children: [
-                                _SummaryCard(label: '應收', amount: _report!.summary.totalExpected, color: Colors.blue),
+                                _SummaryCard(label: l10n.expected, amount: _report!.summary.totalExpected, color: Colors.blue),
                                 const SizedBox(width: 8),
-                                _SummaryCard(label: '已收', amount: _report!.summary.totalPaid, color: Colors.green),
+                                _SummaryCard(label: l10n.received, amount: _report!.summary.totalPaid, color: Colors.green),
                               ],
                             ),
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                _SummaryCard(label: '待繳', amount: _report!.summary.totalPending, color: Colors.orange),
+                                _SummaryCard(label: l10n.paymentPending, amount: _report!.summary.totalPending, color: Colors.orange),
                                 const SizedBox(width: 8),
-                                _SummaryCard(label: '逾期', amount: _report!.summary.totalOverdue, color: Colors.red),
+                                _SummaryCard(label: l10n.paymentOverdue, amount: _report!.summary.totalOverdue, color: Colors.red),
                               ],
                             ),
                             const SizedBox(height: 24),
-                            Text('各房間明細', style: Theme.of(context).textTheme.titleSmall),
+                            Text(l10n.roomDetails, style: Theme.of(context).textTheme.titleSmall),
                             const SizedBox(height: 8),
                             if (_report!.payments.isEmpty)
-                              Center(child: Text('本月無帳單', style: TextStyle(color: Colors.grey[500])))
+                              Center(child: Text(l10n.noInvoicesThisMonth, style: TextStyle(color: Colors.grey[500])))
                             else
                               ..._report!.payments.map((p) => Card(
                                     margin: const EdgeInsets.only(bottom: 8),

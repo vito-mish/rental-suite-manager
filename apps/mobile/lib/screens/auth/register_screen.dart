@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../l10n/app_localizations.dart';
 import '../../main.dart';
 import '../../utils/auth_error.dart';
 
@@ -38,9 +39,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       debugPrint('[Register] signUp success: user=${res.user?.id}, session=${res.session != null}');
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('註冊成功！請檢查 Email 驗證信。'),
+          SnackBar(
+            content: Text(l10n.registerSuccess),
             backgroundColor: Colors.green,
           ),
         );
@@ -50,14 +52,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
       debugPrint('[Register] AuthException: ${e.statusCode} ${e.message}');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(localizeAuthError(e.message)), backgroundColor: Colors.red),
+          SnackBar(content: Text(localizeAuthError(context, e.message)), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
       debugPrint('[Register] Unexpected error: $e');
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('發生未知錯誤，請稍後再試'), backgroundColor: Colors.red),
+          SnackBar(content: Text(l10n.unknownError), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -67,8 +70,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('註冊')),
+      appBar: AppBar(title: Text(l10n.register)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -91,10 +96,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       autofillHints: const [AutofillHints.email],
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return '請輸入 Email';
+                          return l10n.enterEmail;
                         }
                         if (!value.contains('@')) {
-                          return '請輸入有效的 Email';
+                          return l10n.enterValidEmail;
                         }
                         return null;
                       },
@@ -103,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     TextFormField(
                       controller: _passwordController,
                       decoration: InputDecoration(
-                        labelText: '密碼',
+                        labelText: l10n.password,
                         prefixIcon: const Icon(Icons.lock_outlined),
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
@@ -118,10 +123,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       obscureText: _obscurePassword,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return '請輸入密碼';
+                          return l10n.enterPassword;
                         }
                         if (value.length < 6) {
-                          return '密碼至少 6 個字元';
+                          return l10n.passwordMinLength;
                         }
                         return null;
                       },
@@ -129,15 +134,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _confirmPasswordController,
-                      decoration: const InputDecoration(
-                        labelText: '確認密碼',
-                        prefixIcon: Icon(Icons.lock_outlined),
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.confirmPassword,
+                        prefixIcon: const Icon(Icons.lock_outlined),
+                        border: const OutlineInputBorder(),
                       ),
                       obscureText: _obscurePassword,
                       validator: (value) {
                         if (value != _passwordController.text) {
-                          return '密碼不一致';
+                          return l10n.passwordMismatch;
                         }
                         return null;
                       },
@@ -157,7 +162,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text('註冊'),
+                          : Text(l10n.register),
                     ),
                   ],
                 ),

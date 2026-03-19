@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/tenant.dart';
 import '../../services/tenant_service.dart';
 import '../../widgets/tenant_card.dart';
@@ -65,16 +66,17 @@ class TenantListScreenState extends State<TenantListScreen> {
   }
 
   Future<void> _deleteTenant(Tenant tenant) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('確認刪除'),
-        content: Text('確定要刪除「${tenant.name}」嗎？此操作無法復原。'),
+        title: Text(l10n.confirmDeleteTitle),
+        content: Text(l10n.confirmDeleteContent(tenant.name)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('取消')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('刪除', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -95,6 +97,8 @@ class TenantListScreenState extends State<TenantListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         heroTag: 'tenant_fab',
@@ -116,7 +120,7 @@ class TenantListScreenState extends State<TenantListScreen> {
               controller: _searchController,
               onChanged: _onSearchChanged,
               decoration: InputDecoration(
-                hintText: '搜尋姓名、手機號碼、Email',
+                hintText: l10n.searchTenantHint,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -143,7 +147,7 @@ class TenantListScreenState extends State<TenantListScreen> {
                           children: [
                             Text(_error!, style: const TextStyle(color: Colors.red)),
                             const SizedBox(height: 8),
-                            TextButton(onPressed: _loadTenants, child: const Text('重試')),
+                            TextButton(onPressed: _loadTenants, child: Text(l10n.retry)),
                           ],
                         ),
                       )
@@ -154,9 +158,9 @@ class TenantListScreenState extends State<TenantListScreen> {
                               children: [
                                 Icon(Icons.people_outline, size: 64, color: Colors.grey[300]),
                                 const SizedBox(height: 16),
-                                Text('尚無租客', style: TextStyle(color: Colors.grey[500], fontSize: 16)),
+                                Text(l10n.noTenants, style: TextStyle(color: Colors.grey[500], fontSize: 16)),
                                 const SizedBox(height: 8),
-                                const Text('點擊右下角 + 新增租客'),
+                                Text(l10n.addTenantHint),
                               ],
                             ),
                           )

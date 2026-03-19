@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../l10n/app_localizations.dart';
+import '../../l10n/l10n_helper.dart';
 import '../../models/property.dart';
 import '../../services/property_service.dart';
 
@@ -22,9 +24,6 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
   late final TextEditingController _rentController;
   bool _loading = false;
 
-  static const _allFacilities = [
-    'WiFi', '冷氣', '冰箱', '洗衣機', '熱水器', '電視', '衣櫃', '書桌', '床',
-  ];
   late Set<String> _selectedFacilities;
 
   @override
@@ -87,9 +86,11 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isEditing ? '編輯房源' : '新增房源'),
+        title: Text(widget.isEditing ? l10n.editProperty : l10n.addProperty),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -104,14 +105,14 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: _floorController,
-                        decoration: const InputDecoration(
-                          labelText: '樓層',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: l10n.floor,
+                          border: const OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.number,
                         validator: (v) {
-                          if (v == null || v.isEmpty) return '請輸入樓層';
-                          if (int.tryParse(v) == null) return '請輸入整數';
+                          if (v == null || v.isEmpty) return l10n.enterFloor;
+                          if (int.tryParse(v) == null) return l10n.enterInteger;
                           return null;
                         },
                       ),
@@ -120,11 +121,11 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: _roomNumberController,
-                        decoration: const InputDecoration(
-                          labelText: '房號',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: l10n.roomNumber,
+                          border: const OutlineInputBorder(),
                         ),
-                        validator: (v) => v == null || v.trim().isEmpty ? '請輸入房號' : null,
+                        validator: (v) => v == null || v.trim().isEmpty ? l10n.enterRoomNumber : null,
                       ),
                     ),
                   ],
@@ -132,56 +133,56 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _areaController,
-                  decoration: const InputDecoration(
-                    labelText: '坪數',
-                    border: OutlineInputBorder(),
-                    suffixText: '坪',
+                  decoration: InputDecoration(
+                    labelText: l10n.area,
+                    border: const OutlineInputBorder(),
+                    suffixText: l10n.areaSuffix,
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                   ],
                   validator: (v) {
-                    if (v == null || v.isEmpty) return '請輸入坪數';
+                    if (v == null || v.isEmpty) return l10n.enterArea;
                     final n = double.tryParse(v);
-                    if (n == null || n <= 0) return '請輸入有效數字';
+                    if (n == null || n <= 0) return l10n.enterValidNumber;
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _rentController,
-                  decoration: const InputDecoration(
-                    labelText: '月租金',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.attach_money),
-                    suffixText: '元',
+                  decoration: InputDecoration(
+                    labelText: l10n.monthlyRent,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.attach_money),
+                    suffixText: l10n.currencySuffix,
                   ),
                   keyboardType: TextInputType.number,
                   validator: (v) {
-                    if (v == null || v.isEmpty) return '請輸入月租金';
+                    if (v == null || v.isEmpty) return l10n.enterMonthlyRent;
                     final n = int.tryParse(v);
-                    if (n == null || n <= 0) return '請輸入有效金額';
+                    if (n == null || n <= 0) return l10n.enterValidAmount;
                     return null;
                   },
                 ),
                 const SizedBox(height: 24),
-                Text('設施', style: Theme.of(context).textTheme.titleSmall),
+                Text(l10n.facilities, style: Theme.of(context).textTheme.titleSmall),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
                   runSpacing: 4,
-                  children: _allFacilities.map((f) {
-                    final selected = _selectedFacilities.contains(f);
+                  children: facilityDbKeys.map((dbKey) {
+                    final selected = _selectedFacilities.contains(dbKey);
                     return FilterChip(
-                      label: Text(f),
+                      label: Text(localizeFacility(l10n, dbKey)),
                       selected: selected,
                       onSelected: (v) {
                         setState(() {
                           if (v) {
-                            _selectedFacilities.add(f);
+                            _selectedFacilities.add(dbKey);
                           } else {
-                            _selectedFacilities.remove(f);
+                            _selectedFacilities.remove(dbKey);
                           }
                         });
                       },
@@ -200,7 +201,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
                           width: 20,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
-                      : Text(widget.isEditing ? '儲存' : '新增'),
+                      : Text(widget.isEditing ? l10n.save : l10n.add),
                 ),
               ],
             ),

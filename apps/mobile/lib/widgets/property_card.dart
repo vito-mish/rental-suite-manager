@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
+import '../l10n/l10n_helper.dart';
 import '../models/property.dart';
 
 class PropertyCard extends StatelessWidget {
@@ -32,6 +34,7 @@ class PropertyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final lease = property.activeLease;
     final isExpired = lease?.isExpired ?? false;
 
@@ -62,7 +65,7 @@ class PropertyCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      property.status.label,
+                      localizePropertyStatus(l10n, property.status.value),
                       style: TextStyle(
                         color: _statusColor(property.status),
                         fontSize: 12,
@@ -82,11 +85,11 @@ class PropertyCard extends StatelessWidget {
                       },
                       itemBuilder: (_) => [
                         if (onEdit != null)
-                          const PopupMenuItem(value: 'edit', child: Text('編輯')),
+                          PopupMenuItem(value: 'edit', child: Text(l10n.edit)),
                         if (onDelete != null)
-                          const PopupMenuItem(
+                          PopupMenuItem(
                             value: 'delete',
-                            child: Text('刪除', style: TextStyle(color: Colors.red)),
+                            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
                           ),
                       ],
                     ),
@@ -101,11 +104,11 @@ class PropertyCard extends StatelessWidget {
                   const SizedBox(width: 16),
                   const Icon(Icons.square_foot, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
-                  Text('${property.area} 坪'),
+                  Text(l10n.areaWithUnit('${property.area}')),
                   const SizedBox(width: 16),
                   const Icon(Icons.attach_money, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
-                  Text('${property.monthlyRent}/月'),
+                  Text(l10n.rentPerMonth(property.monthlyRent)),
                 ],
               ),
               // Active lease info with validity
@@ -119,7 +122,7 @@ class PropertyCard extends StatelessWidget {
                     const SizedBox(width: 12),
                     const Icon(Icons.receipt, size: 16, color: Colors.grey),
                     const SizedBox(width: 4),
-                    Text('${lease.paidCount}/${lease.totalPayments} 期'),
+                    Text(l10n.periodCount(lease.paidCount, lease.totalPayments)),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -140,8 +143,8 @@ class PropertyCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         isExpired
-                            ? '已逾期 — 使用期效至 ${_formatDate(lease.validUntil)}'
-                            : '使用期效至 ${_formatDate(lease.validUntil)}',
+                            ? l10n.overdueValidUntil(_formatDate(lease.validUntil))
+                            : l10n.validUntilDate(_formatDate(lease.validUntil)),
                         style: TextStyle(
                           color: isExpired ? Colors.red : Colors.green,
                           fontSize: 12,

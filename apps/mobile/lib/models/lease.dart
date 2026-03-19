@@ -46,18 +46,7 @@ class Lease {
 
   bool get isActive => status == 'ACTIVE';
 
-  String get statusLabel {
-    switch (status) {
-      case 'ACTIVE':
-        return '進行中';
-      case 'EXPIRED':
-        return '已到期';
-      case 'TERMINATED':
-        return '已終止';
-      default:
-        return status;
-    }
-  }
+  String get statusLabel => status;
 
   int get remainingDays => endDate.difference(DateTime.now()).inDays;
 }

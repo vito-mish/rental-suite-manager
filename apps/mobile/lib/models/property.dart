@@ -1,12 +1,11 @@
 enum PropertyStatus {
-  vacant('VACANT', '空房'),
-  occupied('OCCUPIED', '出租中'),
-  maintenance('MAINTENANCE', '維修中'),
-  archived('ARCHIVED', '已封存');
+  vacant('VACANT'),
+  occupied('OCCUPIED'),
+  maintenance('MAINTENANCE'),
+  archived('ARCHIVED');
 
-  const PropertyStatus(this.value, this.label);
+  const PropertyStatus(this.value);
   final String value;
-  final String label;
 
   static PropertyStatus fromString(String s) =>
       PropertyStatus.values.firstWhere((e) => e.value == s, orElse: () => vacant);
@@ -205,14 +204,7 @@ class LeasePayment {
     );
   }
 
-  String get statusLabel {
-    switch (status) {
-      case 'PAID': return '已繳';
-      case 'PENDING': return '待繳';
-      case 'OVERDUE': return '逾期';
-      default: return status;
-    }
-  }
+  String get statusLabel => status;
 }
 
 class TenantInfo {

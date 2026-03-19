@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
+import '../../l10n/l10n_helper.dart';
 import '../../models/property.dart';
 import '../../services/property_service.dart';
 import 'property_form_screen.dart';
@@ -58,6 +60,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   String _fmtDate(DateTime d) => '${d.year}/${d.month.toString().padLeft(2, '0')}/${d.day.toString().padLeft(2, '0')}';
 
   Widget _buildLeaseSection(ActiveLease lease) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -66,19 +70,19 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                _InfoRow(icon: Icons.person, label: '租客', value: lease.tenant.name),
-                _InfoRow(icon: Icons.phone, label: '電話', value: lease.tenant.phone),
+                _InfoRow(icon: Icons.person, label: l10n.tenant, value: lease.tenant.name),
+                _InfoRow(icon: Icons.phone, label: l10n.phoneLabel, value: lease.tenant.phone),
                 if (lease.tenant.email != null)
                   _InfoRow(icon: Icons.email, label: 'Email', value: lease.tenant.email!),
                 _InfoRow(
                   icon: Icons.calendar_today,
-                  label: '租期',
+                  label: l10n.leasePeriod,
                   value: '${_fmtDate(lease.startDate)} ~ ${_fmtDate(lease.endDate)}',
                 ),
-                _InfoRow(icon: Icons.attach_money, label: '月租', value: 'NT\$ ${lease.monthlyRent}'),
+                _InfoRow(icon: Icons.attach_money, label: l10n.monthlyRentShort, value: 'NT\$ ${lease.monthlyRent}'),
                 _InfoRow(
                   icon: Icons.timer,
-                  label: '使用期效',
+                  label: l10n.validUntilLabel,
                   value: _fmtDate(lease.validUntil),
                 ),
               ],
@@ -99,7 +103,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                 const Icon(Icons.error_outline, color: Colors.red, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  '使用期效已過期，請催繳租金',
+                  l10n.validityExpiredWarning,
                   style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.w600),
                 ),
               ],
@@ -107,7 +111,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           ),
         // Payment history
         const SizedBox(height: 24),
-        Text('繳款紀錄 (${lease.paidCount}/${lease.payments.length})', style: Theme.of(context).textTheme.titleSmall),
+        Text(l10n.paymentHistoryCount(lease.paidCount, lease.payments.length), style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
         ...lease.payments.map((p) => Card(
               margin: const EdgeInsets.only(bottom: 4),
@@ -119,9 +123,11 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                   size: 20,
                 ),
                 title: Text('NT\$ ${p.amount}'),
-                subtitle: Text('到期 ${_fmtDate(p.dueDate)}'),
+                subtitle: Text(l10n.dueDate(_fmtDate(p.dueDate))),
                 trailing: Text(
-                  p.status == 'PAID' ? '${p.statusLabel} ${_fmtDate(p.paidDate!)}' : p.statusLabel,
+                  p.status == 'PAID'
+                      ? '${localizePaymentStatus(l10n, p.status)} ${_fmtDate(p.paidDate!)}'
+                      : localizePaymentStatus(l10n, p.status),
                   style: TextStyle(
                     color: p.status == 'PAID' ? Colors.green : p.status == 'OVERDUE' ? Colors.red : Colors.orange,
                     fontSize: 12,
@@ -135,9 +141,11 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_property?.roomNumber ?? '房源詳情'),
+        title: Text(_property?.roomNumber ?? l10n.propertyDetail),
         actions: [
           if (_property != null)
             IconButton(
@@ -163,7 +171,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     children: [
                       Text(_error!, style: const TextStyle(color: Colors.red)),
                       const SizedBox(height: 8),
-                      TextButton(onPressed: _loadDetail, child: const Text('重試')),
+                      TextButton(onPressed: _loadDetail, child: Text(l10n.retry)),
                     ],
                   ),
                 )
@@ -180,7 +188,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          _property!.status.label,
+                          localizePropertyStatus(l10n, _property!.status.value),
                           style: TextStyle(
                             color: _statusColor(_property!.status),
                             fontWeight: FontWeight.w600,
@@ -195,9 +203,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                           padding: const EdgeInsets.all(16),
                           child: Column(
                             children: [
-                              _InfoRow(icon: Icons.layers, label: '樓層', value: '${_property!.floor}F'),
-                              _InfoRow(icon: Icons.meeting_room, label: '房號', value: _property!.roomNumber),
-                              _InfoRow(icon: Icons.square_foot, label: '坪數', value: '${_property!.area} 坪'),
+                              _InfoRow(icon: Icons.layers, label: l10n.floor, value: '${_property!.floor}F'),
+                              _InfoRow(icon: Icons.meeting_room, label: l10n.roomNumber, value: _property!.roomNumber),
+                              _InfoRow(icon: Icons.square_foot, label: l10n.area, value: l10n.areaWithUnit('${_property!.area}')),
                             ],
                           ),
                         ),
@@ -206,18 +214,18 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                       // Facilities
                       if (_property!.facilities.isNotEmpty) ...[
                         const SizedBox(height: 24),
-                        Text('設施', style: Theme.of(context).textTheme.titleSmall),
+                        Text(l10n.facilities, style: Theme.of(context).textTheme.titleSmall),
                         const SizedBox(height: 8),
                         Wrap(
                           spacing: 8,
                           runSpacing: 4,
-                          children: _property!.facilities.map((f) => Chip(label: Text(f))).toList(),
+                          children: _property!.facilities.map((f) => Chip(label: Text(localizeFacility(l10n, f)))).toList(),
                         ),
                       ],
 
                       // Rental status
                       const SizedBox(height: 24),
-                      Text('租約狀態', style: Theme.of(context).textTheme.titleSmall),
+                      Text(l10n.leaseStatusTitle, style: Theme.of(context).textTheme.titleSmall),
                       const SizedBox(height: 8),
                       _property!.activeLeaseDetail != null
                           ? _buildLeaseSection(_property!.activeLeaseDetail!)
@@ -229,7 +237,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                                     children: [
                                       Icon(Icons.home_outlined, size: 48, color: Colors.grey[400]),
                                       const SizedBox(height: 8),
-                                      Text('目前空房', style: TextStyle(color: Colors.grey[500])),
+                                      Text(l10n.currentlyVacant, style: TextStyle(color: Colors.grey[500])),
                                     ],
                                   ),
                                 ),

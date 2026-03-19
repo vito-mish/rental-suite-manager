@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
+import '../../l10n/l10n_helper.dart';
 import '../../models/tenant.dart';
 import '../../services/tenant_service.dart';
 import '../../services/lease_service.dart';
@@ -44,19 +46,6 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
     }
   }
 
-  String _leaseStatusLabel(String status) {
-    switch (status) {
-      case 'ACTIVE':
-        return '進行中';
-      case 'EXPIRED':
-        return '已到期';
-      case 'TERMINATED':
-        return '已終止';
-      default:
-        return status;
-    }
-  }
-
   Color _leaseStatusColor(String status) {
     switch (status) {
       case 'ACTIVE':
@@ -81,14 +70,16 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
   }
 
   Widget _buildLeaseAction() {
+    final l10n = AppLocalizations.of(context)!;
     final active = _activeLease;
     if (active != null) {
+      final location = '${active.floor}F ${active.roomNumber}';
       return SizedBox(
         width: double.infinity,
         child: OutlinedButton.icon(
           onPressed: () => _handleMoveOut(active),
           icon: const Icon(Icons.logout, color: Colors.red),
-          label: Text('退房（${active.floor}F ${active.roomNumber}）',
+          label: Text(l10n.moveOutWithLocation(location),
               style: const TextStyle(color: Colors.red)),
           style: OutlinedButton.styleFrom(
             side: const BorderSide(color: Colors.red),
@@ -113,7 +104,7 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
             if (result == true) _loadDetail();
           },
           icon: const Icon(Icons.login),
-          label: const Text('辦理入住'),
+          label: Text(l10n.moveIn),
           style: FilledButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 14),
           ),
@@ -123,16 +114,18 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
   }
 
   Future<void> _handleMoveOut(LeaseHistory lease) async {
+    final l10n = AppLocalizations.of(context)!;
+    final location = '${lease.floor}F ${lease.roomNumber}';
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('確認退房'),
-        content: Text('確定要讓「${_tenant!.name}」從 ${lease.floor}F ${lease.roomNumber} 退房嗎？'),
+        title: Text(l10n.confirmMoveOutTitle),
+        content: Text(l10n.confirmMoveOutContent(_tenant!.name, location)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('取消')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('確認退房', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.confirmMoveOutTitle, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -143,7 +136,7 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
       await LeaseService.moveOut(lease.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('退房成功'), backgroundColor: Colors.green),
+          SnackBar(content: Text(l10n.moveOutSuccess), backgroundColor: Colors.green),
         );
         _loadDetail();
       }
@@ -158,9 +151,11 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_tenant?.name ?? '租客詳情'),
+        title: Text(_tenant?.name ?? l10n.tenantDetail),
         actions: [
           if (_tenant != null)
             IconButton(
@@ -186,7 +181,7 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
                     children: [
                       Text(_error!, style: const TextStyle(color: Colors.red)),
                       const SizedBox(height: 8),
-                      TextButton(onPressed: _loadDetail, child: const Text('重試')),
+                      TextButton(onPressed: _loadDetail, child: Text(l10n.retry)),
                     ],
                   ),
                 )
@@ -204,22 +199,22 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
                             padding: const EdgeInsets.all(16),
                             child: Column(
                               children: [
-                                _InfoRow(icon: Icons.person, label: '姓名', value: _tenant!.name),
-                                _InfoRow(icon: Icons.phone, label: '手機', value: _tenant!.phone),
+                                _InfoRow(icon: Icons.person, label: l10n.nameLabel, value: _tenant!.name),
+                                _InfoRow(icon: Icons.phone, label: l10n.mobileLabel, value: _tenant!.phone),
                                 if (_tenant!.email != null && _tenant!.email!.isNotEmpty)
                                   _InfoRow(icon: Icons.email, label: 'Email', value: _tenant!.email!),
                                 if (_tenant!.idNumber != null && _tenant!.idNumber!.isNotEmpty)
-                                  _InfoRow(icon: Icons.badge, label: '身份證', value: _tenant!.idNumber!),
+                                  _InfoRow(icon: Icons.badge, label: l10n.idCardLabel, value: _tenant!.idNumber!),
                                 if (_tenant!.moveInDate != null)
                                   _InfoRow(
                                     icon: Icons.login,
-                                    label: '入住日',
+                                    label: l10n.moveInDateLabel,
                                     value: _tenant!.moveInDate!.toString().substring(0, 10),
                                   ),
                                 if (_tenant!.moveOutDate != null)
                                   _InfoRow(
                                     icon: Icons.logout,
-                                    label: '退房日',
+                                    label: l10n.moveOutDateLabel,
                                     value: _tenant!.moveOutDate!.toString().substring(0, 10),
                                   ),
                               ],
@@ -233,7 +228,7 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
 
                         // Lease history (T-24)
                         const SizedBox(height: 24),
-                        Text('租約紀錄', style: Theme.of(context).textTheme.titleSmall),
+                        Text(l10n.leaseHistory, style: Theme.of(context).textTheme.titleSmall),
                         const SizedBox(height: 8),
                         if (_tenant!.leases.isEmpty)
                           Card(
@@ -244,7 +239,7 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
                                   children: [
                                     Icon(Icons.description_outlined, size: 48, color: Colors.grey[400]),
                                     const SizedBox(height: 8),
-                                    Text('尚無租約紀錄', style: TextStyle(color: Colors.grey[500])),
+                                    Text(l10n.noLeaseHistory, style: TextStyle(color: Colors.grey[500])),
                                   ],
                                 ),
                               ),
@@ -273,7 +268,7 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
                                               borderRadius: BorderRadius.circular(12),
                                             ),
                                             child: Text(
-                                              _leaseStatusLabel(lease.status),
+                                              localizeLeaseStatus(l10n, lease.status),
                                               style: TextStyle(
                                                 color: _leaseStatusColor(lease.status),
                                                 fontSize: 12,
@@ -286,18 +281,18 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
                                       const SizedBox(height: 8),
                                       _InfoRow(
                                         icon: Icons.calendar_today,
-                                        label: '租期',
+                                        label: l10n.leasePeriod,
                                         value:
                                             '${lease.startDate.toString().substring(0, 10)} ~ ${lease.endDate.toString().substring(0, 10)}',
                                       ),
                                       _InfoRow(
                                         icon: Icons.attach_money,
-                                        label: '月租',
+                                        label: l10n.monthlyRentShort,
                                         value: 'NT\$ ${lease.monthlyRent}',
                                       ),
                                       _InfoRow(
                                         icon: Icons.account_balance_wallet,
-                                        label: '押金',
+                                        label: l10n.deposit,
                                         value: 'NT\$ ${lease.deposit}',
                                       ),
                                     ],
@@ -307,7 +302,7 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
 
                         // Documents (T-23)
                         const SizedBox(height: 24),
-                        Text('文件', style: Theme.of(context).textTheme.titleSmall),
+                        Text(l10n.documents, style: Theme.of(context).textTheme.titleSmall),
                         const SizedBox(height: 8),
                         if (_tenant!.documents.isEmpty)
                           Card(
@@ -318,7 +313,7 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
                                   children: [
                                     Icon(Icons.folder_open, size: 48, color: Colors.grey[400]),
                                     const SizedBox(height: 8),
-                                    Text('尚無文件', style: TextStyle(color: Colors.grey[500])),
+                                    Text(l10n.noDocuments, style: TextStyle(color: Colors.grey[500])),
                                   ],
                                 ),
                               ),
@@ -330,7 +325,7 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
                                 child: ListTile(
                                   leading: const Icon(Icons.insert_drive_file),
                                   title: Text(doc.name),
-                                  subtitle: Text(doc.typeLabel),
+                                  subtitle: Text(localizeDocType(l10n, doc.type)),
                                   trailing: Text(
                                     doc.createdAt.toString().substring(0, 10),
                                     style: TextStyle(color: Colors.grey[500], fontSize: 12),

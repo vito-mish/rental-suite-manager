@@ -1,23 +1,27 @@
-String localizeAuthError(String message) {
+import 'package:flutter/widgets.dart';
+import '../l10n/app_localizations.dart';
+
+String localizeAuthError(BuildContext context, String message) {
+  final l10n = AppLocalizations.of(context)!;
   switch (message) {
     case 'Invalid login credentials':
-      return 'Email 或密碼錯誤，或信箱尚未驗證';
+      return l10n.authInvalidCredentials;
     case 'Email not confirmed':
-      return '信箱尚未驗證，請先確認驗證信';
+      return l10n.authEmailNotConfirmed;
     case 'User already registered':
-      return '此 Email 已註冊';
+      return l10n.authEmailRegistered;
     case 'Signup requires a valid password':
-      return '請輸入有效的密碼';
+      return l10n.authInvalidPassword;
     case 'Password should be at least 6 characters':
-      return '密碼至少需要 6 個字元';
+      return l10n.authPasswordMinLength;
     case 'For security purposes, you can only request this once every 60 seconds':
-      return '請等待 60 秒後再試';
+      return l10n.authRateLimit;
     case 'Email rate limit exceeded':
-      return 'Email 發送次數已達上限，請稍後再試';
+      return l10n.authEmailRateLimit;
     default:
       if (message.contains('email')) {
-        return 'Email 相關錯誤：$message';
+        return l10n.authEmailError(message);
       }
-      return '發生錯誤：$message';
+      return l10n.authGenericError(message);
   }
 }
