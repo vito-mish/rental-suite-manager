@@ -569,6 +569,26 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noInvoicesThisMonth => '本月無帳單';
 
   @override
+  String get exportCsv => '匯出 CSV';
+
+  @override
+  String exportSuccess(String path) {
+    return '已匯出至 $path';
+  }
+
+  @override
+  String get exportNoData => '無資料可匯出';
+
+  @override
+  String get statusLabel => '狀態';
+
+  @override
+  String get paymentMethodLabel => '付款方式';
+
+  @override
+  String get paidDateLabel => '繳費日期';
+
+  @override
   String overdueValidUntil(String date) {
     return '已逾期 — 使用期效至 $date';
   }
@@ -1179,6 +1199,26 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get noInvoicesThisMonth => '本月無帳單';
+
+  @override
+  String get exportCsv => '匯出 CSV';
+
+  @override
+  String exportSuccess(String path) {
+    return '已匯出至 $path';
+  }
+
+  @override
+  String get exportNoData => '無資料可匯出';
+
+  @override
+  String get statusLabel => '狀態';
+
+  @override
+  String get paymentMethodLabel => '付款方式';
+
+  @override
+  String get paidDateLabel => '繳費日期';
 
   @override
   String overdueValidUntil(String date) {

@@ -1,5 +1,9 @@
+import 'dart:io';
+import 'package:csv/csv.dart' show CsvEncoder;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
+import '../../l10n/l10n_helper.dart';
 import '../../models/payment.dart';
 import '../../services/payment_service.dart';
 
@@ -34,6 +38,53 @@ class _PaymentReportScreenState extends State<PaymentReportScreen> {
     }
   }
 
+  Future<void> _exportCsv() async {
+    final l10n = AppLocalizations.of(context)!;
+    if (_report == null || _report!.payments.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.exportNoData)),
+      );
+      return;
+    }
+
+    final rows = <List<String>>[
+      [l10n.floor, l10n.roomNumber, l10n.nameLabel, l10n.monthlyRent, l10n.discountAmount, l10n.finalAmount, l10n.statusLabel, l10n.paymentMethodLabel, l10n.paidDateLabel],
+      ..._report!.payments.map((p) => [
+        p.lease.property.floor.toString(),
+        p.lease.property.roomNumber,
+        p.lease.tenant.name,
+        p.amount.toString(),
+        p.discount.toString(),
+        (p.amount - p.discount).toString(),
+        localizePaymentStatus(l10n, p.status),
+        localizePaymentMethod(l10n, p.method),
+        p.paidDate?.toString().substring(0, 10) ?? '',
+      ]),
+    ];
+
+    final csvContent = CsvEncoder(addBom: true).convert(rows);
+    final fileName = 'payment_report_$_currentMonth.csv';
+
+    final downloadsDir = '${Platform.environment['HOME']}/Downloads';
+    final path = await FilePicker.platform.saveFile(
+      dialogTitle: l10n.exportCsv,
+      fileName: fileName,
+      initialDirectory: downloadsDir,
+      type: FileType.custom,
+      allowedExtensions: ['csv'],
+    );
+
+    if (path == null) return;
+
+    await File(path).writeAsString(csvContent);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.exportSuccess(path)), backgroundColor: Colors.green),
+      );
+    }
+  }
+
   void _changeMonth(int delta) {
     final parts = _currentMonth.split('-').map(int.parse).toList();
     final d = DateTime(parts[0], parts[1] + delta, 1);
@@ -48,7 +99,16 @@ class _PaymentReportScreenState extends State<PaymentReportScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.monthlyReport)),
+      appBar: AppBar(
+        title: Text(l10n.monthlyReport),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.file_download),
+            tooltip: l10n.exportCsv,
+            onPressed: _exportCsv,
+          ),
+        ],
+      ),
       body: Column(
         children: [
           // Month selector
@@ -112,9 +172,20 @@ class _PaymentReportScreenState extends State<PaymentReportScreen> {
                                       ),
                                       title: Text('${p.lease.property.floor}F ${p.lease.property.roomNumber}'),
                                       subtitle: Text(p.lease.tenant.name),
-                                      trailing: Text(
-                                        'NT\$ ${p.amount}',
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      trailing: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            'NT\$ ${p.amount - p.discount}',
+                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                          if (p.discount > 0)
+                                            Text(
+                                              '-NT\$ ${p.discount}',
+                                              style: TextStyle(color: Colors.green[600], fontSize: 12),
+                                            ),
+                                        ],
                                       ),
                                     ),
                                   )),

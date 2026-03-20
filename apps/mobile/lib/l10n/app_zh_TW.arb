@@ -277,6 +277,17 @@
   "received": "已收",
   "roomDetails": "各房間明細",
   "noInvoicesThisMonth": "本月無帳單",
+  "exportCsv": "匯出 CSV",
+  "exportSuccess": "已匯出至 {path}",
+  "@exportSuccess": {
+    "placeholders": {
+      "path": { "type": "String" }
+    }
+  },
+  "exportNoData": "無資料可匯出",
+  "statusLabel": "狀態",
+  "paymentMethodLabel": "付款方式",
+  "paidDateLabel": "繳費日期",
 
   "overdueValidUntil": "已逾期 — 使用期效至 {date}",
   "@overdueValidUntil": {

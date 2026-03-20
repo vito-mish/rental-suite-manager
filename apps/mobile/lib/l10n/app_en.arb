@@ -205,6 +205,17 @@
   "received": "Received",
   "roomDetails": "Details by Room",
   "noInvoicesThisMonth": "No invoices this month",
+  "exportCsv": "Export CSV",
+  "exportSuccess": "Exported to {path}",
+  "@exportSuccess": {
+    "placeholders": {
+      "path": { "type": "String" }
+    }
+  },
+  "exportNoData": "No data to export",
+  "statusLabel": "Status",
+  "paymentMethodLabel": "Payment Method",
+  "paidDateLabel": "Paid Date",
 
   "overdueValidUntil": "Overdue — valid until {date}",
   "validUntilDate": "Valid until {date}",

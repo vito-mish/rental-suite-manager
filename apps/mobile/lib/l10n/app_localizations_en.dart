@@ -578,6 +578,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noInvoicesThisMonth => 'No invoices this month';
 
   @override
+  String get exportCsv => 'Export CSV';
+
+  @override
+  String exportSuccess(String path) {
+    return 'Exported to $path';
+  }
+
+  @override
+  String get exportNoData => 'No data to export';
+
+  @override
+  String get statusLabel => 'Status';
+
+  @override
+  String get paymentMethodLabel => 'Payment Method';
+
+  @override
+  String get paidDateLabel => 'Paid Date';
+
+  @override
   String overdueValidUntil(String date) {
     return 'Overdue — valid until $date';
   }

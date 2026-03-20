@@ -1155,6 +1155,42 @@ abstract class AppLocalizations {
   /// **'本月無帳單'**
   String get noInvoicesThisMonth;
 
+  /// No description provided for @exportCsv.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'匯出 CSV'**
+  String get exportCsv;
+
+  /// No description provided for @exportSuccess.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'已匯出至 {path}'**
+  String exportSuccess(String path);
+
+  /// No description provided for @exportNoData.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'無資料可匯出'**
+  String get exportNoData;
+
+  /// No description provided for @statusLabel.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'狀態'**
+  String get statusLabel;
+
+  /// No description provided for @paymentMethodLabel.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'付款方式'**
+  String get paymentMethodLabel;
+
+  /// No description provided for @paidDateLabel.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'繳費日期'**
+  String get paidDateLabel;
+
   /// No description provided for @overdueValidUntil.
   ///
   /// In zh_TW, this message translates to:
