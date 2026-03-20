@@ -27,11 +27,24 @@ export default async function publicRoutes(fastify: FastifyInstance) {
     // Normalize phone: strip dashes/spaces for matching
     const phoneDigits = phone.replace(/[^0-9]/g, '');
 
-    const tenant = await prisma.tenant.findFirst({
+    // Search all tenants matching name, then compare phone digits
+    const candidates = await prisma.tenant.findMany({
       where: {
         name: { equals: name, mode: 'insensitive' },
-        phone: { contains: phoneDigits },
       },
+      select: { id: true, phone: true },
+    });
+
+    const matched = candidates.find(
+      (t) => t.phone.replace(/[^0-9]/g, '') === phoneDigits
+    );
+
+    if (!matched) {
+      return reply.status(404).send({ error: '查無資料，請確認姓名與電話是否正確' });
+    }
+
+    const tenant = await prisma.tenant.findFirst({
+      where: { id: matched.id },
       select: {
         id: true,
         name: true,
