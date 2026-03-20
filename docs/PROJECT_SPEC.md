@@ -29,7 +29,7 @@
 |--------|------|------|----------|
 | Sprint 1 | 基礎建設與認證系統 | ✅ 已完成 | [SPRINT_1_DONE.md](SPRINT_1_DONE.md) |
 | Sprint 2 | 房源、租客、租約、收租核心 | ✅ 已完成 | [SPRINT_2_DONE.md](SPRINT_2_DONE.md) |
-| Sprint 3 | 核心業務流程完善（合約、帳務、匯入） | 待開始 | [SPRINT_3.md](SPRINT_3.md) |
+| Sprint 3 | 核心業務流程完善（合約、帳務、匯入） | 🔄 進行中 | [SPRINT_3.md](SPRINT_3.md) |
 | Sprint 4 | 營運管理（抄表、報修、儀表板） | 待開始 | [SPRINT_4.md](SPRINT_4.md) |
 | Sprint 5 | 多平台擴展與通知系統 | 待開始 | [SPRINT_5.md](SPRINT_5.md) |
 
