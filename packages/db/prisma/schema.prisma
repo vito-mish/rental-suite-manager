@@ -58,6 +58,7 @@ model Tenant {
   phone       String
   email       String?
   idNumber    String?
+  lineId      String?
   moveInDate  DateTime?
   moveOutDate DateTime?
   createdAt   DateTime  @default(now())
@@ -67,8 +68,21 @@ model Tenant {
   leases              Lease[]
   maintenanceRequests MaintenanceRequest[]
   documents           TenantDocument[]
+  emergencyContacts   EmergencyContact[]
 
   @@index([userId])
+}
+
+model EmergencyContact {
+  id           String  @id @default(cuid())
+  tenantId     String
+  name         String
+  phone        String
+  isCoResident Boolean @default(false)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
 }
 
 model TenantDocument {

@@ -205,6 +205,8 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
                                   _InfoRow(icon: Icons.email, label: 'Email', value: _tenant!.email!),
                                 if (_tenant!.idNumber != null && _tenant!.idNumber!.isNotEmpty)
                                   _InfoRow(icon: Icons.badge, label: l10n.idCardLabel, value: _tenant!.idNumber!),
+                                if (_tenant!.lineId != null && _tenant!.lineId!.isNotEmpty)
+                                  _InfoRow(icon: Icons.chat, label: 'Line ID', value: _tenant!.lineId!),
                                 if (_tenant!.moveInDate != null)
                                   _InfoRow(
                                     icon: Icons.login,
@@ -221,6 +223,51 @@ class _TenantDetailScreenState extends State<TenantDetailScreen> {
                             ),
                           ),
                         ),
+
+                        // Emergency contacts
+                        if (_tenant!.emergencyContacts.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          Text(l10n.emergencyContacts, style: Theme.of(context).textTheme.titleSmall),
+                          const SizedBox(height: 8),
+                          ...(_tenant!.emergencyContacts.map((c) => Card(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.person_outline, size: 18, color: Colors.grey),
+                                          const SizedBox(width: 8),
+                                          Text(c.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                                          if (c.isCoResident) ...[
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: Colors.blue.withValues(alpha: 0.1),
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              child: Text(l10n.isCoResident,
+                                                  style: const TextStyle(fontSize: 11, color: Colors.blue)),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.phone, size: 16, color: Colors.grey),
+                                          const SizedBox(width: 8),
+                                          Text(c.phone),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ))),
+                        ],
 
                         // Move-in / Move-out action (T-22)
                         const SizedBox(height: 16),

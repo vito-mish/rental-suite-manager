@@ -627,12 +627,6 @@ abstract class AppLocalizations {
   /// **'冰箱'**
   String get facilityFridge;
 
-  /// No description provided for @facilityWasher.
-  ///
-  /// In zh_TW, this message translates to:
-  /// **'洗衣機'**
-  String get facilityWasher;
-
   /// No description provided for @facilityWaterHeater.
   ///
   /// In zh_TW, this message translates to:
@@ -662,6 +656,12 @@ abstract class AppLocalizations {
   /// In zh_TW, this message translates to:
   /// **'床'**
   String get facilityBed;
+
+  /// No description provided for @facilityChair.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'椅子'**
+  String get facilityChair;
 
   /// No description provided for @tenant.
   ///
@@ -860,6 +860,48 @@ abstract class AppLocalizations {
   /// In zh_TW, this message translates to:
   /// **'身份證字號（選填）'**
   String get idNumberOptional;
+
+  /// No description provided for @lineIdOptional.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'Line ID（選填）'**
+  String get lineIdOptional;
+
+  /// No description provided for @lineIdSameAsPhone.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'ID 同手機號碼'**
+  String get lineIdSameAsPhone;
+
+  /// No description provided for @emergencyContacts.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'緊急聯絡人'**
+  String get emergencyContacts;
+
+  /// No description provided for @addEmergencyContact.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'新增緊急聯絡人'**
+  String get addEmergencyContact;
+
+  /// No description provided for @contactName.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'姓名'**
+  String get contactName;
+
+  /// No description provided for @contactPhone.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'電話'**
+  String get contactPhone;
+
+  /// No description provided for @isCoResident.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'同住人'**
+  String get isCoResident;
 
   /// No description provided for @deposit.
   ///

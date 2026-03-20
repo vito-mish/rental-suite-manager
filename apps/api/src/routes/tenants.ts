@@ -18,17 +18,24 @@ export default async function tenantRoutes(fastify: FastifyInstance) {
       return reply.status(400).send({ error: parsed.error.flatten() });
     }
 
-    const { email, idNumber, moveInDate, moveOutDate, ...rest } = parsed.data;
+    const { email, idNumber, lineId, moveInDate, moveOutDate, emergencyContacts, ...rest } = parsed.data;
 
     const tenant = await prisma.tenant.create({
       data: {
         ...rest,
         email: email || null,
         idNumber: idNumber || null,
+        lineId: lineId || null,
         moveInDate: moveInDate ? new Date(moveInDate) : null,
         moveOutDate: moveOutDate ? new Date(moveOutDate) : null,
         userId: request.userId,
+        ...(emergencyContacts && emergencyContacts.length > 0 && {
+          emergencyContacts: {
+            create: emergencyContacts,
+          },
+        }),
       },
+      include: { emergencyContacts: true },
     });
 
     return reply.status(201).send(tenant);
@@ -86,6 +93,7 @@ export default async function tenantRoutes(fastify: FastifyInstance) {
           orderBy: { startDate: 'desc' },
         },
         documents: { orderBy: { createdAt: 'desc' } },
+        emergencyContacts: true,
       },
     });
 
@@ -111,16 +119,25 @@ export default async function tenantRoutes(fastify: FastifyInstance) {
       return reply.status(404).send({ error: '找不到此租客' });
     }
 
-    const { email, idNumber, moveInDate, moveOutDate, ...rest } = parsed.data;
+    const { email, idNumber, lineId, moveInDate, moveOutDate, emergencyContacts, ...rest } = parsed.data;
     const data: Record<string, unknown> = { ...rest };
     if (email !== undefined) data.email = email || null;
     if (idNumber !== undefined) data.idNumber = idNumber || null;
+    if (lineId !== undefined) data.lineId = lineId || null;
     if (moveInDate !== undefined) data.moveInDate = moveInDate ? new Date(moveInDate) : null;
     if (moveOutDate !== undefined) data.moveOutDate = moveOutDate ? new Date(moveOutDate) : null;
+
+    if (emergencyContacts !== undefined) {
+      data.emergencyContacts = {
+        deleteMany: {},
+        create: emergencyContacts,
+      };
+    }
 
     const updated = await prisma.tenant.update({
       where: { id: request.params.id },
       data,
+      include: { emergencyContacts: true },
     });
 
     return reply.send(updated);

@@ -287,9 +287,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get facilityFridge => 'Fridge';
 
   @override
-  String get facilityWasher => 'Washer';
-
-  @override
   String get facilityWaterHeater => 'Water Heater';
 
   @override
@@ -303,6 +300,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get facilityBed => 'Bed';
+
+  @override
+  String get facilityChair => 'Chair';
 
   @override
   String get tenant => 'Tenant';
@@ -411,6 +411,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get idNumberOptional => 'ID Number (optional)';
+
+  @override
+  String get lineIdOptional => 'Line ID (optional)';
+
+  @override
+  String get lineIdSameAsPhone => 'Same as phone';
+
+  @override
+  String get emergencyContacts => 'Emergency Contacts';
+
+  @override
+  String get addEmergencyContact => 'Add Emergency Contact';
+
+  @override
+  String get contactName => 'Name';
+
+  @override
+  String get contactPhone => 'Phone';
+
+  @override
+  String get isCoResident => 'Co-resident';
 
   @override
   String get deposit => 'Deposit';

@@ -5,8 +5,14 @@ export const createTenantSchema = z.object({
   phone: z.string().min(1).max(20),
   email: z.union([z.string().email(), z.literal('')]).optional(),
   idNumber: z.union([z.string().max(20), z.literal('')]).optional(),
+  lineId: z.union([z.string().max(50), z.literal('')]).optional(),
   moveInDate: z.string().datetime().optional(),
   moveOutDate: z.string().datetime().optional(),
+  emergencyContacts: z.array(z.object({
+    name: z.string().min(1).max(100),
+    phone: z.string().min(1).max(20),
+    isCoResident: z.boolean().default(false),
+  })).optional(),
 });
 
 export const updateTenantSchema = createTenantSchema.partial();

@@ -4,6 +4,7 @@ class Tenant {
   final String phone;
   final String? email;
   final String? idNumber;
+  final String? lineId;
   final DateTime? moveInDate;
   final DateTime? moveOutDate;
   final DateTime createdAt;
@@ -16,6 +17,7 @@ class Tenant {
     required this.phone,
     this.email,
     this.idNumber,
+    this.lineId,
     this.moveInDate,
     this.moveOutDate,
     required this.createdAt,
@@ -35,6 +37,7 @@ class Tenant {
       phone: json['phone'],
       email: json['email'],
       idNumber: json['idNumber'],
+      lineId: json['lineId'],
       moveInDate: json['moveInDate'] != null ? DateTime.parse(json['moveInDate']) : null,
       moveOutDate: json['moveOutDate'] != null ? DateTime.parse(json['moveOutDate']) : null,
       createdAt: DateTime.parse(json['createdAt']),
@@ -47,6 +50,7 @@ class Tenant {
 class TenantDetail extends Tenant {
   final List<LeaseHistory> leases;
   final List<TenantDocument> documents;
+  final List<EmergencyContact> emergencyContacts;
 
   TenantDetail({
     required super.id,
@@ -54,12 +58,14 @@ class TenantDetail extends Tenant {
     required super.phone,
     super.email,
     super.idNumber,
+    super.lineId,
     super.moveInDate,
     super.moveOutDate,
     required super.createdAt,
     required super.updatedAt,
     required this.leases,
     required this.documents,
+    this.emergencyContacts = const [],
   });
 
   factory TenantDetail.fromJson(Map<String, dynamic> json) {
@@ -69,12 +75,14 @@ class TenantDetail extends Tenant {
       phone: json['phone'],
       email: json['email'],
       idNumber: json['idNumber'],
+      lineId: json['lineId'],
       moveInDate: json['moveInDate'] != null ? DateTime.parse(json['moveInDate']) : null,
       moveOutDate: json['moveOutDate'] != null ? DateTime.parse(json['moveOutDate']) : null,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
       leases: (json['leases'] as List? ?? []).map((e) => LeaseHistory.fromJson(e)).toList(),
       documents: (json['documents'] as List? ?? []).map((e) => TenantDocument.fromJson(e)).toList(),
+      emergencyContacts: (json['emergencyContacts'] as List? ?? []).map((e) => EmergencyContact.fromJson(e)).toList(),
     );
   }
 }
@@ -171,4 +179,33 @@ class TenantDocument {
   }
 
   String get typeLabel => type;
+}
+
+class EmergencyContact {
+  final String? id;
+  final String name;
+  final String phone;
+  final bool isCoResident;
+
+  EmergencyContact({
+    this.id,
+    required this.name,
+    required this.phone,
+    this.isCoResident = false,
+  });
+
+  factory EmergencyContact.fromJson(Map<String, dynamic> json) {
+    return EmergencyContact(
+      id: json['id'],
+      name: json['name'],
+      phone: json['phone'],
+      isCoResident: json['isCoResident'] ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'phone': phone,
+    'isCoResident': isCoResident,
+  };
 }

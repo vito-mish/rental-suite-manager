@@ -27,12 +27,17 @@ class TenantService {
     required String phone,
     String? email,
     String? idNumber,
+    String? lineId,
+    List<EmergencyContact>? emergencyContacts,
   }) async {
     final res = await ApiService.post('/api/tenants', {
       'name': name,
       'phone': phone,
       if (email != null && email.isNotEmpty) 'email': email,
       if (idNumber != null && idNumber.isNotEmpty) 'idNumber': idNumber,
+      if (lineId != null && lineId.isNotEmpty) 'lineId': lineId,
+      if (emergencyContacts != null && emergencyContacts.isNotEmpty)
+        'emergencyContacts': emergencyContacts.map((e) => e.toJson()).toList(),
     });
     return Tenant.fromJson(res);
   }

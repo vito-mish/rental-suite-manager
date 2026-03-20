@@ -68,8 +68,13 @@ String localizeDocType(AppLocalizations l10n, String type) {
 
 /// Facility DB keys (Chinese) — these are stored in the database
 const facilityDbKeys = [
-  'WiFi', '冷氣', '冰箱', '洗衣機', '熱水器', '電視', '衣櫃', '書桌', '床',
+  '冷氣', '冰箱', '熱水器', '床', '衣櫃', '書桌', '椅子', 'WiFi', '電視',
 ];
+
+/// Default facilities for new properties
+const defaultFacilities = {
+  '冷氣', '冰箱', '熱水器', '床', '衣櫃', '書桌', '椅子',
+};
 
 /// Get localized display name for a facility DB key
 String localizeFacility(AppLocalizations l10n, String dbKey) {
@@ -80,8 +85,6 @@ String localizeFacility(AppLocalizations l10n, String dbKey) {
       return l10n.facilityAC;
     case '冰箱':
       return l10n.facilityFridge;
-    case '洗衣機':
-      return l10n.facilityWasher;
     case '熱水器':
       return l10n.facilityWaterHeater;
     case '電視':
@@ -92,6 +95,8 @@ String localizeFacility(AppLocalizations l10n, String dbKey) {
       return l10n.facilityDesk;
     case '床':
       return l10n.facilityBed;
+    case '椅子':
+      return l10n.facilityChair;
     default:
       return dbKey;
   }

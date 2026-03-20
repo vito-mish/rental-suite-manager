@@ -9,16 +9,26 @@ class ApiService {
     defaultValue: 'http://localhost:3001',
   );
 
-  static Map<String, String> get _headers {
-    final token = Supabase.instance.client.auth.currentSession?.accessToken;
+  static Future<String?> _getFreshToken() async {
+    final session = Supabase.instance.client.auth.currentSession;
+    if (session == null) return null;
+    if (session.isExpired) {
+      final response = await Supabase.instance.client.auth.refreshSession();
+      return response.session?.accessToken;
+    }
+    return session.accessToken;
+  }
+
+  static Future<Map<String, String>> _getHeaders() async {
+    final token = await _getFreshToken();
     return {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
     };
   }
 
-  static Map<String, String> get _authOnlyHeaders {
-    final token = Supabase.instance.client.auth.currentSession?.accessToken;
+  static Future<Map<String, String>> _getAuthOnlyHeaders() async {
+    final token = await _getFreshToken();
     return {
       if (token != null) 'Authorization': 'Bearer $token',
     };
@@ -26,23 +36,26 @@ class ApiService {
 
   static Future<Map<String, dynamic>> get(String path, {Map<String, String>? query}) async {
     final uri = Uri.parse('$_baseUrl$path').replace(queryParameters: query);
-    final res = await http.get(uri, headers: _headers);
+    final headers = await _getHeaders();
+    final res = await http.get(uri, headers: headers);
     return _handleResponse(res);
   }
 
   static Future<Map<String, dynamic>> post(String path, Map<String, dynamic> body) async {
+    final headers = await _getHeaders();
     final res = await http.post(
       Uri.parse('$_baseUrl$path'),
-      headers: _headers,
+      headers: headers,
       body: jsonEncode(body),
     );
     return _handleResponse(res);
   }
 
   static Future<Map<String, dynamic>> put(String path, Map<String, dynamic> body) async {
+    final headers = await _getHeaders();
     final res = await http.put(
       Uri.parse('$_baseUrl$path'),
-      headers: _headers,
+      headers: headers,
       body: jsonEncode(body),
     );
     return _handleResponse(res);
@@ -51,7 +64,8 @@ class ApiService {
   static Future<void> delete(String path) async {
     final uri = Uri.parse('$_baseUrl$path');
     debugPrint('[API] DELETE $uri');
-    final res = await http.delete(uri, headers: _authOnlyHeaders);
+    final headers = await _getAuthOnlyHeaders();
+    final res = await http.delete(uri, headers: headers);
     debugPrint('[API] DELETE response: ${res.statusCode} ${res.body}');
     if (res.statusCode != 204) {
       if (res.body.isNotEmpty) {
@@ -65,9 +79,10 @@ class ApiService {
   static Future<Map<String, dynamic>> patch(String path, [Map<String, dynamic>? body]) async {
     final uri = Uri.parse('$_baseUrl$path');
     debugPrint('[API] PATCH $uri');
+    final headers = body != null ? await _getHeaders() : await _getAuthOnlyHeaders();
     final res = await http.patch(
       uri,
-      headers: body != null ? _headers : _authOnlyHeaders,
+      headers: headers,
       body: body != null ? jsonEncode(body) : null,
     );
     debugPrint('[API] PATCH response: ${res.statusCode} ${res.body}');

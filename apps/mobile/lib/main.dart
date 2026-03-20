@@ -95,11 +95,43 @@ class MyAppState extends State<MyApp> {
   }
 }
 
-class AuthGate extends StatelessWidget {
+class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
 
   @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  bool _refreshing = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _tryRefreshSession();
+  }
+
+  Future<void> _tryRefreshSession() async {
+    try {
+      final session = supabase.auth.currentSession;
+      if (session != null) {
+        await supabase.auth.refreshSession();
+      }
+    } catch (_) {
+      // If refresh fails, user will be redirected to login
+    } finally {
+      if (mounted) setState(() => _refreshing = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_refreshing) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return StreamBuilder<AuthState>(
       stream: supabase.auth.onAuthStateChange,
       builder: (context, snapshot) {

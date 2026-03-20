@@ -279,9 +279,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get facilityFridge => '冰箱';
 
   @override
-  String get facilityWasher => '洗衣機';
-
-  @override
   String get facilityWaterHeater => '熱水器';
 
   @override
@@ -295,6 +292,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get facilityBed => '床';
+
+  @override
+  String get facilityChair => '椅子';
 
   @override
   String get tenant => '租客';
@@ -402,6 +402,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get idNumberOptional => '身份證字號（選填）';
+
+  @override
+  String get lineIdOptional => 'Line ID（選填）';
+
+  @override
+  String get lineIdSameAsPhone => 'ID 同手機號碼';
+
+  @override
+  String get emergencyContacts => '緊急聯絡人';
+
+  @override
+  String get addEmergencyContact => '新增緊急聯絡人';
+
+  @override
+  String get contactName => '姓名';
+
+  @override
+  String get contactPhone => '電話';
+
+  @override
+  String get isCoResident => '同住人';
 
   @override
   String get deposit => '押金';
@@ -845,9 +866,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get facilityFridge => '冰箱';
 
   @override
-  String get facilityWasher => '洗衣機';
-
-  @override
   String get facilityWaterHeater => '熱水器';
 
   @override
@@ -861,6 +879,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get facilityBed => '床';
+
+  @override
+  String get facilityChair => '椅子';
 
   @override
   String get tenant => '租客';
@@ -968,6 +989,27 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get idNumberOptional => '身份證字號（選填）';
+
+  @override
+  String get lineIdOptional => 'Line ID（選填）';
+
+  @override
+  String get lineIdSameAsPhone => 'ID 同手機號碼';
+
+  @override
+  String get emergencyContacts => '緊急聯絡人';
+
+  @override
+  String get addEmergencyContact => '新增緊急聯絡人';
+
+  @override
+  String get contactName => '姓名';
+
+  @override
+  String get contactPhone => '電話';
+
+  @override
+  String get isCoResident => '同住人';
 
   @override
   String get deposit => '押金';

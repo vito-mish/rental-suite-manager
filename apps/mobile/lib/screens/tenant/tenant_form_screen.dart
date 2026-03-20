@@ -21,7 +21,10 @@ class _TenantFormScreenState extends State<TenantFormScreen> {
   late final TextEditingController _phoneController;
   late final TextEditingController _emailController;
   late final TextEditingController _idNumberController;
+  late final TextEditingController _lineIdController;
   bool _loading = false;
+
+  final List<_EmergencyContactEntry> _emergencyContacts = [];
 
   @override
   void initState() {
@@ -31,6 +34,28 @@ class _TenantFormScreenState extends State<TenantFormScreen> {
     _phoneController = TextEditingController(text: _formatPhone(t?.phone ?? ''));
     _emailController = TextEditingController(text: t?.email ?? '');
     _idNumberController = TextEditingController(text: t?.idNumber ?? '');
+    _lineIdController = TextEditingController(text: t?.lineId ?? '');
+
+    if (widget.isEditing) {
+      _loadExistingContacts();
+    }
+  }
+
+  Future<void> _loadExistingContacts() async {
+    try {
+      final detail = await TenantService.getDetail(widget.tenant!.id);
+      if (mounted) {
+        setState(() {
+          for (final c in detail.emergencyContacts) {
+            _emergencyContacts.add(_EmergencyContactEntry(
+              nameController: TextEditingController(text: c.name),
+              phoneController: TextEditingController(text: _formatPhone(c.phone)),
+              isCoResident: c.isCoResident,
+            ));
+          }
+        });
+      }
+    } catch (_) {}
   }
 
   @override
@@ -39,6 +64,11 @@ class _TenantFormScreenState extends State<TenantFormScreen> {
     _phoneController.dispose();
     _emailController.dispose();
     _idNumberController.dispose();
+    _lineIdController.dispose();
+    for (final c in _emergencyContacts) {
+      c.nameController.dispose();
+      c.phoneController.dispose();
+    }
     super.dispose();
   }
 
@@ -53,12 +83,23 @@ class _TenantFormScreenState extends State<TenantFormScreen> {
 
     setState(() => _loading = true);
     try {
+      final contacts = _emergencyContacts
+          .where((c) => c.nameController.text.trim().isNotEmpty)
+          .map((c) => EmergencyContact(
+                name: c.nameController.text.trim(),
+                phone: c.phoneController.text.trim(),
+                isCoResident: c.isCoResident,
+              ))
+          .toList();
+
       if (widget.isEditing) {
         await TenantService.update(widget.tenant!.id, {
           'name': _nameController.text.trim(),
           'phone': _phoneController.text.trim(),
           'email': _emailController.text.trim(),
           'idNumber': _idNumberController.text.trim(),
+          'lineId': _lineIdController.text.trim(),
+          'emergencyContacts': contacts.map((c) => c.toJson()).toList(),
         });
       } else {
         await TenantService.create(
@@ -66,6 +107,8 @@ class _TenantFormScreenState extends State<TenantFormScreen> {
           phone: _phoneController.text.trim(),
           email: _emailController.text.trim(),
           idNumber: _idNumberController.text.trim(),
+          lineId: _lineIdController.text.trim(),
+          emergencyContacts: contacts,
         );
       }
       if (mounted) Navigator.pop(context, true);
@@ -142,7 +185,121 @@ class _TenantFormScreenState extends State<TenantFormScreen> {
                     prefixIcon: const Icon(Icons.badge),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _lineIdController,
+                        decoration: InputDecoration(
+                          labelText: l10n.lineIdOptional,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.chat),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: TextButton(
+                        onPressed: () {
+                          final phone = _phoneController.text.replaceAll(RegExp(r'[^0-9]'), '');
+                          if (phone.isNotEmpty) {
+                            _lineIdController.text = phone;
+                          }
+                        },
+                        child: Text(l10n.lineIdSameAsPhone),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Text(l10n.emergencyContacts, style: Theme.of(context).textTheme.titleSmall),
+                    const Spacer(),
+                    TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _emergencyContacts.add(_EmergencyContactEntry(
+                            nameController: TextEditingController(),
+                            phoneController: TextEditingController(),
+                          ));
+                        });
+                      },
+                      icon: const Icon(Icons.add, size: 18),
+                      label: Text(l10n.addEmergencyContact),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                ..._emergencyContacts.asMap().entries.map((entry) {
+                  final idx = entry.key;
+                  final contact = entry.value;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: contact.nameController,
+                                    decoration: InputDecoration(
+                                      labelText: l10n.contactName,
+                                      border: const OutlineInputBorder(),
+                                      isDense: true,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: contact.phoneController,
+                                    decoration: InputDecoration(
+                                      labelText: l10n.contactPhone,
+                                      border: const OutlineInputBorder(),
+                                      isDense: true,
+                                    ),
+                                    keyboardType: TextInputType.phone,
+                                    inputFormatters: [_PhoneFormatter()],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                                  onPressed: () {
+                                    setState(() {
+                                      contact.nameController.dispose();
+                                      contact.phoneController.dispose();
+                                      _emergencyContacts.removeAt(idx);
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: contact.isCoResident,
+                                  onChanged: (v) {
+                                    setState(() => contact.isCoResident = v ?? false);
+                                  },
+                                ),
+                                Text(l10n.isCoResident),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 16),
                 FilledButton(
                   onPressed: _loading ? null : _save,
                   style: FilledButton.styleFrom(
@@ -163,6 +320,18 @@ class _TenantFormScreenState extends State<TenantFormScreen> {
       ),
     );
   }
+}
+
+class _EmergencyContactEntry {
+  final TextEditingController nameController;
+  final TextEditingController phoneController;
+  bool isCoResident;
+
+  _EmergencyContactEntry({
+    required this.nameController,
+    required this.phoneController,
+    this.isCoResident = false,
+  });
 }
 
 /// Auto-formats phone input: 0933221389 -> 0933-221-389

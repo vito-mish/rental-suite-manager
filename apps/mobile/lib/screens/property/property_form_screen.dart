@@ -34,7 +34,9 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
     _roomNumberController = TextEditingController(text: p?.roomNumber ?? '');
     _areaController = TextEditingController(text: p?.area.toString() ?? '');
     _rentController = TextEditingController(text: p != null && p.monthlyRent > 0 ? p.monthlyRent.toString() : '');
-    _selectedFacilities = Set.from(p?.facilities ?? []);
+    _selectedFacilities = widget.isEditing
+        ? Set.from(p?.facilities ?? [])
+        : Set.from(defaultFacilities);
   }
 
   @override
