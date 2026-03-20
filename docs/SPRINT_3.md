@@ -30,7 +30,7 @@
 |------|------|------|------|
 | T-57 | 新增公開查詢 API：`GET /api/public/tenant-records`，以姓名+電話查詢合約與繳費紀錄，不需登入，加 rate limit 與 CORS | BE | ✅ Done |
 | T-58 | 建立租客查詢靜態網頁（`apps/web/`），純 HTML + Tailwind CSS，響應式設計，支援手機瀏覽 | FE | ✅ Done |
-| T-59 | API 部署至 Render 免費方案（`.onrender.com`），設定環境變數與 Supabase 連線 | infra | |
+| T-59 | API 部署至 Render 免費方案（`.onrender.com`），設定環境變數與 Supabase 連線 | infra | ✅ Done |
 | T-60 | Web 部署至 Vercel 免費方案（`.vercel.app`），設定 API base URL | infra | |
 
 ## 交付標準
