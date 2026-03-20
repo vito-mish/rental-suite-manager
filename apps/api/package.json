@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^11",
+    "@fastify/rate-limit": "^10.3.0",
     "@rental-suite/db": "workspace:*",
     "@rental-suite/shared": "workspace:*",
     "fastify": "^5",
