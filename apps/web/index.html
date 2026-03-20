@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>繳費紀錄查詢 — Rental Suite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { primary: '#2563EB' }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-primary text-white py-4 shadow">
+    <div class="max-w-lg mx-auto px-4">
+      <h1 class="text-lg font-bold">繳費紀錄查詢</h1>
+      <p class="text-sm text-blue-100">Rental Suite Manager</p>
+    </div>
+  </header>
+
+  <main class="max-w-lg mx-auto px-4 py-6">
+
+    <!-- Search Form -->
+    <form id="searchForm" class="bg-white rounded-xl shadow p-6 space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+        <input type="text" id="nameInput" required placeholder="請輸入姓名"
+          class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">電話</label>
+        <input type="tel" id="phoneInput" required placeholder="0912-345-678"
+          class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
+      </div>
+      <button type="submit" id="submitBtn"
+        class="w-full bg-primary text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+        查詢
+      </button>
+      <p id="errorMsg" class="text-red-500 text-sm text-center hidden"></p>
+    </form>
+
+    <!-- Results -->
+    <div id="results" class="hidden mt-6 space-y-4 fade-in">
+
+      <!-- Tenant Info -->
+      <div class="bg-white rounded-xl shadow p-5">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <div>
+            <div id="tenantName" class="font-bold text-lg"></div>
+            <div id="tenantPhone" class="text-sm text-gray-500"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leases -->
+      <div id="leasesContainer"></div>
+    </div>
+
+  </main>
+
+  <footer class="text-center text-xs text-gray-400 py-6">
+    &copy; 2026 Rental Suite Manager
+  </footer>
+
+  <script>
+    const API_BASE = window.location.hostname === 'localhost'
+      ? 'http://localhost:3001'
+      : 'API_PLACEHOLDER';
+
+    const form = document.getElementById('searchForm');
+    const nameInput = document.getElementById('nameInput');
+    const phoneInput = document.getElementById('phoneInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const results = document.getElementById('results');
+
+    // Phone auto-format
+    phoneInput.addEventListener('input', (e) => {
+      let digits = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+      if (digits.length > 7) {
+        digits = digits.slice(0,4) + '-' + digits.slice(4,7) + '-' + digits.slice(7);
+      } else if (digits.length > 4) {
+        digits = digits.slice(0,4) + '-' + digits.slice(4);
+      }
+      e.target.value = digits;
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMsg.classList.add('hidden');
+      results.classList.add('hidden');
+      submitBtn.disabled = true;
+      submitBtn.textContent = '查詢中...';
+
+      try {
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        const url = `${API_BASE}/api/public/tenant-records?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || '查詢失敗');
+        }
+
+        renderResults(data);
+      } catch (err) {
+        errorMsg.textContent = err.message;
+        errorMsg.classList.remove('hidden');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '查詢';
+      }
+    });
+
+    function renderResults(tenant) {
+      document.getElementById('tenantName').textContent = tenant.name;
+      document.getElementById('tenantPhone').textContent = tenant.phone;
+
+      const container = document.getElementById('leasesContainer');
+      container.innerHTML = '';
+
+      if (!tenant.leases || tenant.leases.length === 0) {
+        container.innerHTML = '<div class="bg-white rounded-xl shadow p-5 text-center text-gray-400">無租約紀錄</div>';
+        results.classList.remove('hidden');
+        return;
+      }
+
+      tenant.leases.forEach(lease => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-xl shadow overflow-hidden';
+
+        const statusMap = { ACTIVE: ['生效中', 'bg-green-100 text-green-700'], EXPIRED: ['已到期', 'bg-orange-100 text-orange-700'], TERMINATED: ['已終止', 'bg-red-100 text-red-700'] };
+        const [statusText, statusClass] = statusMap[lease.status] || [lease.status, 'bg-gray-100 text-gray-700'];
+
+        const startDate = lease.startDate.substring(0, 10);
+        const endDate = lease.endDate.substring(0, 10);
+
+        let html = `
+          <div class="p-5 border-b">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold">${lease.property.floor}F ${lease.property.roomNumber}</span>
+              <span class="text-xs px-2 py-1 rounded-full ${statusClass}">${statusText}</span>
+            </div>
+            <div class="text-sm text-gray-500 space-y-1">
+              <div>租期：${startDate} ~ ${endDate}</div>
+              <div>月租：NT$ ${lease.monthlyRent.toLocaleString()}</div>
+              <div>押金：NT$ ${lease.deposit.toLocaleString()}</div>
+            </div>
+          </div>
+        `;
+
+        // Payments
+        if (lease.payments && lease.payments.length > 0) {
+          html += '<div class="divide-y">';
+          lease.payments.forEach(p => {
+            const due = p.dueDate.substring(0, 10);
+            const paid = p.paidDate ? p.paidDate.substring(0, 10) : '';
+            const pStatusMap = { PAID: ['已繳', 'text-green-600'], PENDING: ['待繳', 'text-orange-600'], OVERDUE: ['逾期', 'text-red-600'] };
+            const [pText, pColor] = pStatusMap[p.status] || [p.status, 'text-gray-600'];
+            const methodMap = { CASH: '現金', TRANSFER: '轉帳' };
+            const methodText = p.method ? methodMap[p.method] || p.method : '';
+            const actualAmount = p.amount - (p.discount || 0);
+
+            html += `
+              <div class="px-5 py-3 flex items-center text-sm">
+                <div class="flex-1">
+                  <div class="text-gray-600">到期 ${due}</div>
+                  ${paid ? `<div class="text-xs text-gray-400">${methodText} ${paid}</div>` : ''}
+                </div>
+                <div class="text-right">
+                  <div class="font-medium">NT$ ${actualAmount.toLocaleString()}</div>
+                  ${p.discount > 0 ? `<div class="text-xs text-green-600">-NT$ ${p.discount.toLocaleString()}</div>` : ''}
+                </div>
+                <span class="ml-3 text-xs font-medium ${pColor}">${pText}</span>
+              </div>
+            `;
+          });
+          html += '</div>';
+        } else {
+          html += '<div class="px-5 py-4 text-sm text-gray-400 text-center">無繳費紀錄</div>';
+        }
+
+        card.innerHTML = html;
+        container.appendChild(card);
+      });
+
+      results.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
