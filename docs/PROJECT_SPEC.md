@@ -59,7 +59,7 @@
 | T-02b | 驗證 Windows 建置與執行 | FE | Sprint 5 |
 | T-02c | 驗證 Android 建置與執行 | FE | Sprint 5 |
 | T-02d | 驗證 iOS 建置與執行 | FE | Sprint 5 |
-| T-03 | 建立 Web 前端專案（Next.js），配置 Tailwind CSS | FE | Sprint 5 |
+| T-03 | 建立 Web 前端專案（純 HTML + Tailwind CSS），租客查詢頁面 | FE | ✅ Done |
 | T-04 | 設定後端 API 服務（Node.js + Fastify），定義 REST 規範 | BE | ✅ Done |
 | T-05 | 建立 CI/CD Pipeline（GitHub Actions），自動化各平台建置與測試 | infra | Sprint 5 |
 | T-06 | 設定共用設計 Token（Design System），統一色彩、字體、間距規範 | design | ✅ Done |
