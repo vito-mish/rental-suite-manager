@@ -203,7 +203,7 @@
 | T-57 | 新增公開查詢 API（姓名+電話查詢合約與繳費紀錄），含 rate limit 與 CORS | BE | ✅ Done |
 | T-58 | 建立租客查詢靜態網頁（`apps/web/`），純 HTML + Tailwind CSS，響應式 | FE | ✅ Done |
 | T-59 | API 部署至 Render 免費方案 | infra | ✅ Done |
-| T-60 | Web 部署至 Vercel 免費方案 | infra | Sprint 3 |
+| T-60 | Web 部署至 Vercel 免費方案 | infra | ✅ Done |
 
 ---
 
