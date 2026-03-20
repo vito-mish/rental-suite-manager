@@ -242,6 +242,23 @@
   "noInvoices": "本月尚無帳單",
   "autoInvoiceHint": "帳單會在辦理入住時自動產生",
   "clickToMarkPaid": "點擊標記繳費",
+  "bulkPay": "批次繳費",
+  "payMonths": "繳費月數",
+  "monthsCount": "{count} 個月",
+  "@monthsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "originalAmount": "原價",
+  "discountAmount": "優惠金額",
+  "finalAmount": "實付金額",
+  "bulkPaySuccess": "已繳費 {count} 個月",
+  "@bulkPaySuccess": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "duePrefix": "到期: {date}",
   "@duePrefix": {
     "placeholders": {

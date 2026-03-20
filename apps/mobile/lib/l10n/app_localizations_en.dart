@@ -528,6 +528,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clickToMarkPaid => 'Tap to mark as paid';
 
   @override
+  String get bulkPay => 'Bulk Pay';
+
+  @override
+  String get payMonths => 'Months';
+
+  @override
+  String monthsCount(int count) {
+    return '$count months';
+  }
+
+  @override
+  String get originalAmount => 'Original';
+
+  @override
+  String get discountAmount => 'Discount';
+
+  @override
+  String get finalAmount => 'Total';
+
+  @override
+  String bulkPaySuccess(int count) {
+    return 'Paid $count months';
+  }
+
+  @override
   String duePrefix(String date) {
     return 'Due: $date';
   }

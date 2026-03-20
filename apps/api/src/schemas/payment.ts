@@ -8,6 +8,14 @@ export const markPaidSchema = z.object({
   receipt: z.string().optional(),
 });
 
+export const batchPaySchema = z.object({
+  leaseId: z.string().min(1),
+  months: z.number().int().min(1).max(12),
+  discount: z.number().int().min(0).default(0),
+  method: PaymentMethod,
+  receipt: z.string().optional(),
+});
+
 export const listPaymentQuerySchema = z.object({
   leaseId: z.string().optional(),
   status: PaymentStatus.optional(),

@@ -519,6 +519,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get clickToMarkPaid => '點擊標記繳費';
 
   @override
+  String get bulkPay => '批次繳費';
+
+  @override
+  String get payMonths => '繳費月數';
+
+  @override
+  String monthsCount(int count) {
+    return '$count 個月';
+  }
+
+  @override
+  String get originalAmount => '原價';
+
+  @override
+  String get discountAmount => '優惠金額';
+
+  @override
+  String get finalAmount => '實付金額';
+
+  @override
+  String bulkPaySuccess(int count) {
+    return '已繳費 $count 個月';
+  }
+
+  @override
   String duePrefix(String date) {
     return '到期: $date';
   }
@@ -1104,6 +1129,31 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get clickToMarkPaid => '點擊標記繳費';
+
+  @override
+  String get bulkPay => '批次繳費';
+
+  @override
+  String get payMonths => '繳費月數';
+
+  @override
+  String monthsCount(int count) {
+    return '$count 個月';
+  }
+
+  @override
+  String get originalAmount => '原價';
+
+  @override
+  String get discountAmount => '優惠金額';
+
+  @override
+  String get finalAmount => '實付金額';
+
+  @override
+  String bulkPaySuccess(int count) {
+    return '已繳費 $count 個月';
+  }
 
   @override
   String duePrefix(String date) {

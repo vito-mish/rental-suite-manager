@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { prisma } from '@rental-suite/db';
 import { authHook } from '../plugins/auth';
-import { markPaidSchema, listPaymentQuerySchema } from '../schemas/payment';
+import { markPaidSchema, listPaymentQuerySchema, batchPaySchema } from '../schemas/payment';
 
 export default async function paymentRoutes(fastify: FastifyInstance) {
   fastify.decorateRequest('userId', '');
@@ -207,6 +207,91 @@ export default async function paymentRoutes(fastify: FastifyInstance) {
       month: `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}`,
       summary: { totalExpected, totalPaid, totalPending, totalOverdue },
       payments,
+    });
+  });
+
+  // Batch pay multiple months at once with optional discount
+  fastify.post('/payments/batch-pay', async (request, reply) => {
+    const parsed = batchPaySchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.status(400).send({ error: parsed.error.flatten() });
+    }
+
+    const { leaseId, months, discount, method, receipt } = parsed.data;
+
+    const lease = await prisma.lease.findFirst({
+      where: { id: leaseId, property: { userId: request.userId } },
+      include: { property: true },
+    });
+
+    if (!lease) {
+      return reply.status(404).send({ error: '找不到此租約' });
+    }
+
+    // Find existing PENDING/OVERDUE payments, ordered by dueDate
+    const existingPayments = await prisma.payment.findMany({
+      where: { leaseId, status: { in: ['PENDING', 'OVERDUE'] } },
+      orderBy: { dueDate: 'asc' },
+    });
+
+    const paymentIds: string[] = [];
+    const perMonthDiscount = Math.floor(discount / months);
+    const firstMonthExtra = discount - perMonthDiscount * months;
+    const now = new Date();
+
+    // Use existing pending payments first, then create new ones for future months
+    let used = 0;
+    for (const p of existingPayments) {
+      if (used >= months) break;
+      paymentIds.push(p.id);
+      used++;
+    }
+
+    // Create missing future payments if needed
+    if (used < months) {
+      // Find the latest payment dueDate to start from
+      const allPayments = await prisma.payment.findMany({
+        where: { leaseId },
+        orderBy: { dueDate: 'desc' },
+        take: 1,
+      });
+
+      let lastDue = allPayments.length > 0 ? new Date(allPayments[0].dueDate) : now;
+
+      for (let i = used; i < months; i++) {
+        lastDue = new Date(lastDue.getFullYear(), lastDue.getMonth() + 1, 1);
+        const newPayment = await prisma.payment.create({
+          data: {
+            leaseId,
+            amount: lease.monthlyRent,
+            dueDate: lastDue,
+            status: 'PENDING',
+          },
+        });
+        paymentIds.push(newPayment.id);
+      }
+    }
+
+    // Mark all as paid with distributed discount
+    for (let i = 0; i < paymentIds.length; i++) {
+      const d = i === 0 ? perMonthDiscount + firstMonthExtra : perMonthDiscount;
+      await prisma.payment.update({
+        where: { id: paymentIds[i] },
+        data: {
+          status: 'PAID',
+          paidDate: now,
+          method,
+          receipt,
+          discount: d,
+        },
+      });
+    }
+
+    return reply.send({
+      paid: paymentIds.length,
+      totalAmount: lease.monthlyRent * months,
+      discount,
+      finalAmount: lease.monthlyRent * months - discount,
     });
   });
 

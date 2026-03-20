@@ -69,40 +69,15 @@ class PaymentListScreenState extends State<PaymentListScreen> {
     }
   }
 
-  Future<void> _markPaid(Payment payment) async {
+  Future<void> _showPayDialog(Payment payment) async {
     final l10n = AppLocalizations.of(context)!;
-    final method = await showDialog<String>(
+    final result = await showModalBottomSheet<bool>(
       context: context,
-      builder: (ctx) => SimpleDialog(
-        title: Text(l10n.paymentMethodTitle(payment.lease.property.roomNumber)),
-        children: [
-          SimpleDialogOption(
-            onPressed: () => Navigator.pop(ctx, 'CASH'),
-            child: ListTile(leading: const Icon(Icons.money), title: Text(l10n.methodCash)),
-          ),
-          SimpleDialogOption(
-            onPressed: () => Navigator.pop(ctx, 'TRANSFER'),
-            child: ListTile(leading: const Icon(Icons.account_balance), title: Text(l10n.methodTransfer)),
-          ),
-        ],
-      ),
+      isScrollControlled: true,
+      builder: (ctx) => _PayBottomSheet(payment: payment, l10n: l10n),
     );
-    if (method == null) return;
-
-    try {
-      await PaymentService.markPaid(payment.id, method: method);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.markedAsPaid), backgroundColor: Colors.green),
-        );
-        _loadPayments();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
-        );
-      }
+    if (result == true && mounted) {
+      _loadPayments();
     }
   }
 
@@ -236,7 +211,7 @@ class PaymentListScreenState extends State<PaymentListScreen> {
                                 return Card(
                                   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                                   child: InkWell(
-                                    onTap: p.status != 'PAID' ? () => _markPaid(p) : null,
+                                    onTap: p.status != 'PAID' ? () => _showPayDialog(p) : null,
                                     borderRadius: BorderRadius.circular(12),
                                     child: Padding(
                                       padding: const EdgeInsets.all(16),
@@ -277,9 +252,19 @@ class PaymentListScreenState extends State<PaymentListScreen> {
                                               const SizedBox(width: 4),
                                               Text(p.lease.tenant.name),
                                               const Spacer(),
-                                              Text(
-                                                'NT\$ ${p.amount}',
-                                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    'NT\$ ${p.amount - p.discount}',
+                                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                  ),
+                                                  if (p.discount > 0)
+                                                    Text(
+                                                      '-NT\$ ${p.discount}',
+                                                      style: TextStyle(color: Colors.green[600], fontSize: 12),
+                                                    ),
+                                                ],
                                               ),
                                             ],
                                           ),
@@ -343,6 +328,230 @@ class PaymentListScreenState extends State<PaymentListScreen> {
           });
           _loadPayments();
         },
+      ),
+    );
+  }
+}
+
+class _PayBottomSheet extends StatefulWidget {
+  final Payment payment;
+  final AppLocalizations l10n;
+
+  const _PayBottomSheet({required this.payment, required this.l10n});
+
+  @override
+  State<_PayBottomSheet> createState() => _PayBottomSheetState();
+}
+
+class _PayBottomSheetState extends State<_PayBottomSheet> {
+  int _months = 1;
+  final _discountController = TextEditingController(text: '0');
+  String? _method;
+  bool _loading = false;
+
+  int get _monthlyRent => widget.payment.amount;
+  int get _discount => int.tryParse(_discountController.text) ?? 0;
+  int get _total => _monthlyRent * _months - _discount;
+
+  @override
+  void dispose() {
+    _discountController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (_method == null) return;
+    setState(() => _loading = true);
+
+    try {
+      if (_months == 1 && _discount == 0) {
+        await PaymentService.markPaid(widget.payment.id, method: _method!);
+      } else {
+        await PaymentService.batchPay(
+          leaseId: widget.payment.leaseId,
+          months: _months,
+          discount: _discount,
+          method: _method!,
+        );
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_months > 1
+                ? widget.l10n.bulkPaySuccess(_months)
+                : widget.l10n.markedAsPaid),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+        setState(() => _loading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = widget.l10n;
+    final p = widget.payment;
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24, right: 24, top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            '${p.lease.property.floor}F ${p.lease.property.roomNumber} — ${p.lease.tenant.name}',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+
+          // Month selector
+          Text(l10n.payMonths, style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            children: [1, 3, 6, 12].map((m) {
+              return ChoiceChip(
+                label: Text(l10n.monthsCount(m)),
+                selected: _months == m,
+                onSelected: (_) => setState(() => _months = m),
+              );
+            }).toList(),
+          ),
+
+          // Discount (only when months > 1)
+          if (_months > 1) ...[
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _discountController,
+              decoration: InputDecoration(
+                labelText: l10n.discountAmount,
+                border: const OutlineInputBorder(),
+                prefixText: 'NT\$ ',
+              ),
+              keyboardType: TextInputType.number,
+              onChanged: (_) => setState(() {}),
+            ),
+          ],
+
+          const SizedBox(height: 16),
+          // Summary
+          Card(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(l10n.originalAmount),
+                      Text('NT\$ ${_monthlyRent * _months}'),
+                    ],
+                  ),
+                  if (_months > 1 && _discount > 0) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(l10n.discountAmount),
+                        Text('-NT\$ $_discount', style: TextStyle(color: Colors.green[600])),
+                      ],
+                    ),
+                  ],
+                  const Divider(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(l10n.finalAmount, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text('NT\$ $_total',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+          // Payment method
+          Row(
+            children: [
+              Expanded(
+                child: _MethodButton(
+                  icon: Icons.money,
+                  label: l10n.methodCash,
+                  selected: _method == 'CASH',
+                  onTap: () => setState(() => _method = 'CASH'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _MethodButton(
+                  icon: Icons.account_balance,
+                  label: l10n.methodTransfer,
+                  selected: _method == 'TRANSFER',
+                  onTap: () => setState(() => _method = 'TRANSFER'),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+          FilledButton(
+            onPressed: _method != null && !_loading && _total > 0 ? _submit : null,
+            style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+            child: _loading
+                ? const SizedBox(
+                    height: 20, width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : Text(_months > 1 ? l10n.bulkPay : l10n.markedAsPaid),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MethodButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _MethodButton({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon),
+      label: Text(label),
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        side: BorderSide(
+          color: selected ? Theme.of(context).colorScheme.primary : Colors.grey[300]!,
+          width: selected ? 2 : 1,
+        ),
+        backgroundColor: selected
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.05)
+            : null,
       ),
     );
   }

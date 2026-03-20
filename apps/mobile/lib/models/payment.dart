@@ -2,6 +2,7 @@ class Payment {
   final String id;
   final String leaseId;
   final int amount;
+  final int discount;
   final DateTime dueDate;
   final DateTime? paidDate;
   final String status;
@@ -14,6 +15,7 @@ class Payment {
     required this.id,
     required this.leaseId,
     required this.amount,
+    this.discount = 0,
     required this.dueDate,
     this.paidDate,
     required this.status,
@@ -28,6 +30,7 @@ class Payment {
       id: json['id'],
       leaseId: json['leaseId'],
       amount: json['amount'],
+      discount: json['discount'] ?? 0,
       dueDate: DateTime.parse(json['dueDate']),
       paidDate: json['paidDate'] != null ? DateTime.parse(json['paidDate']) : null,
       status: json['status'],

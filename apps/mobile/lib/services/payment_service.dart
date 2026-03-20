@@ -54,6 +54,22 @@ class PaymentService {
     return PaymentReport.fromJson(res);
   }
 
+  static Future<Map<String, dynamic>> batchPay({
+    required String leaseId,
+    required int months,
+    required int discount,
+    required String method,
+    String? receipt,
+  }) async {
+    return await ApiService.post('/api/payments/batch-pay', {
+      'leaseId': leaseId,
+      'months': months,
+      'discount': discount,
+      'method': method,
+      if (receipt != null) 'receipt': receipt,
+    });
+  }
+
   static Future<int> markOverdue() async {
     final res = await ApiService.post('/api/payments/mark-overdue', {});
     return res['updated'] as int;

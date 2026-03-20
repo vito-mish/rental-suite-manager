@@ -129,6 +129,7 @@ model Payment {
   id       String        @id @default(cuid())
   leaseId  String
   amount   Int
+  discount Int           @default(0)
   dueDate  DateTime
   paidDate DateTime?
   status   PaymentStatus @default(PENDING)

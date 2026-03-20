@@ -180,6 +180,23 @@
   "noInvoices": "No invoices this month",
   "autoInvoiceHint": "Invoices are auto-generated on check-in",
   "clickToMarkPaid": "Tap to mark as paid",
+  "bulkPay": "Bulk Pay",
+  "payMonths": "Months",
+  "monthsCount": "{count} months",
+  "@monthsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "originalAmount": "Original",
+  "discountAmount": "Discount",
+  "finalAmount": "Total",
+  "bulkPaySuccess": "Paid {count} months",
+  "@bulkPaySuccess": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "duePrefix": "Due: {date}",
   "dueDate": "Due {date}",
 

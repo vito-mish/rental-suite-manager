@@ -1071,6 +1071,48 @@ abstract class AppLocalizations {
   /// **'點擊標記繳費'**
   String get clickToMarkPaid;
 
+  /// No description provided for @bulkPay.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'批次繳費'**
+  String get bulkPay;
+
+  /// No description provided for @payMonths.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'繳費月數'**
+  String get payMonths;
+
+  /// No description provided for @monthsCount.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'{count} 個月'**
+  String monthsCount(int count);
+
+  /// No description provided for @originalAmount.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'原價'**
+  String get originalAmount;
+
+  /// No description provided for @discountAmount.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'優惠金額'**
+  String get discountAmount;
+
+  /// No description provided for @finalAmount.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'實付金額'**
+  String get finalAmount;
+
+  /// No description provided for @bulkPaySuccess.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'已繳費 {count} 個月'**
+  String bulkPaySuccess(int count);
+
   /// No description provided for @duePrefix.
   ///
   /// In zh_TW, this message translates to:
