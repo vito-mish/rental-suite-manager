@@ -25,8 +25,17 @@
 | T-35 | 帳務匯出（Excel / CSV） | FE | ✅ Done |
 | T-36 | 水電費用分攤計算（公用電費按人頭或用量分攤） | BE | |
 
+### S-11 租客繳費查詢網頁
+| Task | 說明 | 類型 | 狀態 |
+|------|------|------|------|
+| T-57 | 新增公開查詢 API：`GET /api/public/tenant-records`，以姓名+電話查詢合約與繳費紀錄，不需登入，加 rate limit 與 CORS | BE | |
+| T-58 | 建立租客查詢靜態網頁（`apps/web/`），純 HTML + Tailwind CSS，響應式設計，支援手機瀏覽 | FE | |
+| T-59 | API 部署至 Render 免費方案（`.onrender.com`），設定環境變數與 Supabase 連線 | infra | |
+| T-60 | Web 部署至 Vercel 免費方案（`.vercel.app`），設定 API base URL | infra | |
+
 ## 交付標準
 - 房東可從 CSV 批次匯入房源
 - 合約可從模板產生並匯出 PDF
 - 逾期租金有自動提醒
 - 帳務可匯出報表
+- 租客可透過網頁輸入姓名+電話查詢合約及繳費紀錄

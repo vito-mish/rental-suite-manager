@@ -20,6 +20,7 @@
 - [S-08 維修報修管理](#s-08-維修報修管理)
 - [S-09 儀表板與數據總覽](#s-09-儀表板與數據總覽)
 - [S-10 通知與推播系統](#s-10-通知與推播系統)
+- [S-11 租客繳費查詢網頁](#s-11-租客繳費查詢網頁)
 
 ---
 
@@ -42,8 +43,8 @@
 | Repo | `rental-suite-manager` |
 | 副標題 | Manage smarter, rent easier. |
 | 支援平台 | macOS、Windows、Web、Android、iOS |
-| Stories | 10 |
-| Tasks | 56 |
+| Stories | 11 |
+| Tasks | 60 |
 
 ---
 
@@ -193,4 +194,17 @@
 
 ---
 
-*共 10 Stories、56 Tasks*
+## S-11 租客繳費查詢網頁
+
+**目標**：提供租客自助查詢管道，透過網頁輸入姓名與電話即可查看合約與繳費紀錄。
+
+| Task | 說明 | 類型 | 狀態 |
+|------|------|------|------|
+| T-57 | 新增公開查詢 API（姓名+電話查詢合約與繳費紀錄），含 rate limit 與 CORS | BE | Sprint 3 |
+| T-58 | 建立租客查詢靜態網頁（`apps/web/`），純 HTML + Tailwind CSS，響應式 | FE | Sprint 3 |
+| T-59 | API 部署至 Render 免費方案 | infra | Sprint 3 |
+| T-60 | Web 部署至 Vercel 免費方案 | infra | Sprint 3 |
+
+---
+
+*共 11 Stories、60 Tasks*
