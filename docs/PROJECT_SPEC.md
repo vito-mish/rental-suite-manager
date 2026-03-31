@@ -21,6 +21,7 @@
 - [S-09 儀表板與數據總覽](#s-09-儀表板與數據總覽)
 - [S-10 通知與推播系統](#s-10-通知與推播系統)
 - [S-11 租客繳費查詢網頁](#s-11-租客繳費查詢網頁)
+- [S-12 API Request Log 查詢系統](#s-12-api-request-log-查詢系統)
 
 ---
 
@@ -43,8 +44,8 @@
 | Repo | `rental-suite-manager` |
 | 副標題 | Manage smarter, rent easier. |
 | 支援平台 | macOS、Windows、Web、Android、iOS |
-| Stories | 11 |
-| Tasks | 60 |
+| Stories | 12 |
+| Tasks | 65 |
 
 ---
 
@@ -207,4 +208,18 @@
 
 ---
 
-*共 11 Stories、60 Tasks*
+## S-12 API Request Log 查詢系統
+
+**目標**：記錄所有 API 請求並提供網頁查詢介面，方便監控系統運行狀態與除錯。
+
+| Task | 說明 | 類型 | 狀態 |
+|------|------|------|------|
+| T-61 | 建立 RequestLog 資料模型（method、url、statusCode、responseTime、ip、userAgent、userId） | BE | ✅ Done |
+| T-62 | 實作 Fastify onResponse hook 自動記錄所有 request 至資料庫 | BE | ✅ Done |
+| T-63 | 實作 GET /api/request-logs 查詢端點，支援 method / url / statusCode / 日期範圍 / 排除 URL / 分頁篩選（需認證） | BE | ✅ Done |
+| T-64 | 建立 Request Logs 查詢網頁（`apps/web/request-logs.html`），支援 GitHub OAuth 登入與手動 Token 登入 | FE | ✅ Done |
+| T-65 | 改造 keep-alive 改打 /health endpoint，使心跳紀錄也納入 request log，網頁提供隱藏 /health 選項 | BE | ✅ Done |
+
+---
+
+*共 12 Stories、65 Tasks*

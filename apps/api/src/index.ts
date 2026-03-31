@@ -6,7 +6,9 @@ import tenantRoutes from './routes/tenants';
 import leaseRoutes from './routes/leases';
 import paymentRoutes from './routes/payments';
 import publicRoutes from './routes/public';
+import requestLogRoutes from './routes/request-logs';
 import { registerKeepAlive } from './plugins/keep-alive';
+import { registerRequestLogger } from './plugins/request-logger';
 
 const app = Fastify({ logger: true });
 
@@ -24,7 +26,9 @@ app.register(tenantRoutes, { prefix: '/api' });
 app.register(leaseRoutes, { prefix: '/api' });
 app.register(paymentRoutes, { prefix: '/api' });
 app.register(publicRoutes, { prefix: '/api/public' });
+app.register(requestLogRoutes, { prefix: '/api' });
 registerKeepAlive(app);
+registerRequestLogger(app);
 
 const start = async () => {
   const port = Number(process.env.PORT) || 3001;

@@ -202,3 +202,19 @@ enum MaintenanceStatus {
   IN_PROGRESS
   COMPLETED
 }
+
+model RequestLog {
+  id           String   @id @default(cuid())
+  method       String
+  url          String
+  statusCode   Int
+  responseTime Int      // milliseconds
+  ip           String?
+  userAgent    String?
+  userId       String?
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([method])
+  @@index([statusCode])
+}

@@ -1,5 +1,4 @@
 import { FastifyInstance } from 'fastify';
-import { prisma } from '@rental-suite/db';
 
 const INTERVAL_MS = 5 * 60 * 1000; // 每 5 分鐘
 const FAILURE_THRESHOLD = 3;
@@ -15,12 +14,14 @@ function ts() {
   return new Date().toISOString();
 }
 
+let serverPort = 3001;
+
 async function pingDb(): Promise<boolean> {
   try {
-    await prisma.$queryRaw`SELECT 1`;
-    return true;
+    const res = await fetch(`http://localhost:${serverPort}/health`);
+    return res.ok;
   } catch (err) {
-    console.error(`[keep-alive] DB ping failed:`, (err as Error).message);
+    console.error(`[keep-alive] Health check failed:`, (err as Error).message);
     return false;
   }
 }
@@ -96,7 +97,9 @@ async function tick() {
 
 export async function registerKeepAlive(app: FastifyInstance) {
   app.addHook('onReady', () => {
-    console.log(`[keep-alive] Started (interval: ${INTERVAL_MS / 1000}s, notify: ${NOTIFY_EMAIL})`);
+    const addr = app.server.address();
+    if (addr && typeof addr === 'object') serverPort = addr.port;
+    console.log(`[keep-alive] Started (interval: ${INTERVAL_MS / 1000}s, port: ${serverPort}, notify: ${NOTIFY_EMAIL})`);
     timer = setInterval(tick, INTERVAL_MS);
     // 啟動後立即 ping 一次
     tick();

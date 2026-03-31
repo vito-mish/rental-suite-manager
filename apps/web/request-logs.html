@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Request Logs — Rental Suite</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect rx='20' width='100' height='100' fill='%232563EB'/><text x='50' y='68' text-anchor='middle' font-size='55' fill='white'>📋</text></svg>" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { primary: '#2563EB' } } }
+    }
+  </script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-primary text-white py-4 shadow">
+    <div class="max-w-5xl mx-auto px-4">
+      <h1 class="text-lg font-bold">API Request Logs</h1>
+      <p class="text-sm text-blue-100">Rental Suite Manager</p>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-6">
+
+    <!-- Auth -->
+    <div id="authSection" class="bg-white rounded-xl shadow p-6 mb-6">
+      <button onclick="loginWithGithub()"
+        class="w-full flex items-center justify-center gap-2 bg-gray-900 text-white px-4 py-3 rounded-lg text-sm font-medium hover:bg-gray-800 transition">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        使用 GitHub 登入
+      </button>
+      <div class="relative my-4">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
+        <div class="relative flex justify-center text-xs"><span class="bg-white px-2 text-gray-400">或手動輸入</span></div>
+      </div>
+      <div class="flex gap-2">
+        <input type="password" id="tokenInput" placeholder="貼上 Supabase JWT token"
+          class="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
+        <button onclick="saveToken()"
+          class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition">登入</button>
+      </div>
+      <p id="authError" class="text-red-500 text-sm mt-2 hidden"></p>
+    </div>
+
+    <!-- Filters -->
+    <div id="filtersSection" class="hidden bg-white rounded-xl shadow p-6 mb-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Method</label>
+          <select id="filterMethod"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none">
+            <option value="">全部</option>
+            <option>GET</option>
+            <option>POST</option>
+            <option>PUT</option>
+            <option>PATCH</option>
+            <option>DELETE</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Status Code</label>
+          <input type="number" id="filterStatus" placeholder="e.g. 200"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">URL 包含</label>
+          <input type="text" id="filterUrl" placeholder="/api/properties"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">日期範圍</label>
+          <input type="date" id="filterFrom"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" />
+        </div>
+      </div>
+      <div class="flex items-center gap-3 mt-2">
+        <label class="flex items-center gap-1.5 text-sm text-gray-600">
+          <input type="checkbox" id="hideHealth" checked class="rounded border-gray-300" />
+          隱藏 /health
+        </label>
+      </div>
+      <div class="flex items-center gap-3 mt-3">
+        <button onclick="loadLogs(1)"
+          class="bg-primary text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition">查詢</button>
+        <button onclick="resetFilters()"
+          class="border border-gray-300 text-gray-600 px-5 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition">清除篩選</button>
+        <span id="totalCount" class="text-sm text-gray-400 ml-auto"></span>
+      </div>
+    </div>
+
+    <!-- Results Table -->
+    <div id="resultsSection" class="hidden fade-in">
+      <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b">
+              <tr>
+                <th class="text-left px-4 py-3 font-medium text-gray-600">時間</th>
+                <th class="text-left px-4 py-3 font-medium text-gray-600">Method</th>
+                <th class="text-left px-4 py-3 font-medium text-gray-600">URL</th>
+                <th class="text-left px-4 py-3 font-medium text-gray-600">Status</th>
+                <th class="text-left px-4 py-3 font-medium text-gray-600">耗時</th>
+                <th class="text-left px-4 py-3 font-medium text-gray-600">IP</th>
+              </tr>
+            </thead>
+            <tbody id="logsBody" class="divide-y"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex items-center justify-between mt-4">
+        <button id="prevBtn" onclick="loadLogs(currentPage - 1)"
+          class="border border-gray-300 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">上一頁</button>
+        <span id="pageInfo" class="text-sm text-gray-500"></span>
+        <button id="nextBtn" onclick="loadLogs(currentPage + 1)"
+          class="border border-gray-300 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">下一頁</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="text-center text-xs text-gray-400 py-6">
+    &copy; 2026 Rental Suite Manager
+  </footer>
+
+  <script>
+    const isLocal = window.location.hostname === 'localhost';
+    const API_BASE = isLocal ? 'http://localhost:3001' : 'API_PLACEHOLDER';
+    const SUPABASE_URL = isLocal
+      ? 'https://sdrwwhtszsyktiervicb.supabase.co'
+      : 'SUPABASE_URL_PLACEHOLDER';
+    const SUPABASE_ANON_KEY = isLocal
+      ? 'sb_publishable_jvjvFQ_3RvQDAuRUKOo06A_ksA0Hx6K'
+      : 'SUPABASE_ANON_KEY_PLACEHOLDER';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let token = '';
+    let currentPage = 1;
+
+    // Check for existing Supabase session or stored token
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        token = session.access_token;
+        showApp();
+      } else if (localStorage.getItem('rsm_token')) {
+        token = localStorage.getItem('rsm_token');
+        showApp();
+      }
+    })();
+
+    // Listen for OAuth redirect callback
+    sb.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        token = session.access_token;
+        localStorage.removeItem('rsm_token');
+        showApp();
+      }
+    });
+
+    async function loginWithGithub() {
+      const redirectTo = window.location.href.split('#')[0].split('?')[0];
+      console.log('loginWithGithub called, redirectTo:', redirectTo);
+      console.log('SUPABASE_URL:', SUPABASE_URL);
+      console.log('supabase client:', sb);
+      try {
+        const { data, error } = await sb.auth.signInWithOAuth({
+          provider: 'github',
+          options: { redirectTo },
+        });
+        console.log('signInWithOAuth result:', { data, error });
+        if (error) {
+          document.getElementById('authError').textContent = error.message;
+          document.getElementById('authError').classList.remove('hidden');
+        }
+      } catch (e) {
+        console.error('loginWithGithub exception:', e);
+        document.getElementById('authError').textContent = e.message;
+        document.getElementById('authError').classList.remove('hidden');
+      }
+    }
+
+    function saveToken() {
+      const input = document.getElementById('tokenInput').value.trim();
+      if (!input) return;
+      token = input;
+      localStorage.setItem('rsm_token', token);
+      showApp();
+    }
+
+    function showApp() {
+      document.getElementById('authSection').classList.add('hidden');
+      document.getElementById('filtersSection').classList.remove('hidden');
+      loadLogs(1);
+    }
+
+    function resetFilters() {
+      document.getElementById('filterMethod').value = '';
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterUrl').value = '';
+      document.getElementById('filterFrom').value = '';
+      loadLogs(1);
+    }
+
+    function methodBadge(method) {
+      const colors = {
+        GET: 'bg-green-100 text-green-700',
+        POST: 'bg-blue-100 text-blue-700',
+        PUT: 'bg-yellow-100 text-yellow-700',
+        PATCH: 'bg-purple-100 text-purple-700',
+        DELETE: 'bg-red-100 text-red-700',
+      };
+      const cls = colors[method] || 'bg-gray-100 text-gray-700';
+      return `<span class="px-2 py-0.5 rounded text-xs font-medium ${cls}">${method}</span>`;
+    }
+
+    function statusBadge(code) {
+      let cls = 'bg-green-100 text-green-700';
+      if (code >= 400 && code < 500) cls = 'bg-yellow-100 text-yellow-700';
+      if (code >= 500) cls = 'bg-red-100 text-red-700';
+      return `<span class="px-2 py-0.5 rounded text-xs font-medium ${cls}">${code}</span>`;
+    }
+
+    async function loadLogs(page) {
+      currentPage = page;
+      const params = new URLSearchParams();
+      params.set('page', page);
+      params.set('limit', '50');
+
+      const method = document.getElementById('filterMethod').value;
+      const statusCode = document.getElementById('filterStatus').value;
+      const url = document.getElementById('filterUrl').value;
+      const from = document.getElementById('filterFrom').value;
+
+      if (method) params.set('method', method);
+      if (statusCode) params.set('statusCode', statusCode);
+      if (url) params.set('url', url);
+      if (from) params.set('from', new Date(from).toISOString());
+      if (document.getElementById('hideHealth').checked) params.set('excludeUrl', '/health');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/request-logs?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.status === 401) {
+          localStorage.removeItem('rsm_token');
+          token = '';
+          document.getElementById('authSection').classList.remove('hidden');
+          document.getElementById('filtersSection').classList.add('hidden');
+          document.getElementById('resultsSection').classList.add('hidden');
+          document.getElementById('authError').textContent = 'Token 無效或已過期，請重新登入';
+          document.getElementById('authError').classList.remove('hidden');
+          return;
+        }
+
+        const data = await res.json();
+        renderLogs(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderLogs({ data: logs, pagination }) {
+      const body = document.getElementById('logsBody');
+      body.innerHTML = '';
+
+      if (logs.length === 0) {
+        body.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">無紀錄</td></tr>';
+      } else {
+        logs.forEach(log => {
+          const time = new Date(log.createdAt).toLocaleString('zh-TW', {
+            month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+          });
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-gray-50';
+          tr.innerHTML = `
+            <td class="px-4 py-3 text-gray-500 whitespace-nowrap">${time}</td>
+            <td class="px-4 py-3">${methodBadge(log.method)}</td>
+            <td class="px-4 py-3 text-gray-700 max-w-xs truncate" title="${log.url}">${log.url}</td>
+            <td class="px-4 py-3">${statusBadge(log.statusCode)}</td>
+            <td class="px-4 py-3 text-gray-500">${log.responseTime}ms</td>
+            <td class="px-4 py-3 text-gray-400 text-xs">${log.ip || '-'}</td>
+          `;
+          body.appendChild(tr);
+        });
+      }
+
+      document.getElementById('resultsSection').classList.remove('hidden');
+      document.getElementById('totalCount').textContent = `共 ${pagination.total} 筆`;
+      document.getElementById('pageInfo').textContent = `第 ${pagination.page} / ${pagination.totalPages} 頁`;
+      document.getElementById('prevBtn').disabled = pagination.page <= 1;
+      document.getElementById('nextBtn').disabled = pagination.page >= pagination.totalPages;
+    }
+  </script>
+</body>
+</html>
