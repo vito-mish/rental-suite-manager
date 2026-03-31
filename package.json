@@ -7,7 +7,9 @@
     "lint": "turbo lint",
     "test": "turbo test",
     "db:generate": "turbo db:generate",
-    "db:push": "turbo db:push"
+    "db:push": "turbo db:push",
+    "build:macos": "cd apps/mobile && flutter build macos --release",
+    "package:dmg": "pnpm build:macos && mkdir -p dist && rm -f dist/SuiteHub-1.0.0.dmg && create-dmg --volname SuiteHub --volicon apps/mobile/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png --window-pos 200 120 --window-size 600 400 --icon-size 100 --icon SuiteHub.app 150 185 --app-drop-link 450 185 --no-internet-enable dist/SuiteHub-1.0.0.dmg apps/mobile/build/macos/Build/Products/Release/SuiteHub.app"
   },
   "devDependencies": {
     "turbo": "^2"
