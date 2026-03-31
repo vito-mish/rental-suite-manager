@@ -229,12 +229,12 @@
 
 | Task | 說明 | 類型 | 狀態 |
 |------|------|------|------|
-| T-66 | 設定 App Icon（1024x1024 icon set），替換 Flutter 預設圖示 | design | Sprint 3 |
-| T-67 | 設定 Bundle ID、App 名稱、版本號（CFBundleIdentifier、CFBundleShortVersionString） | infra | Sprint 3 |
-| T-68 | 設定 macOS entitlements（網路存取、檔案存取等沙盒權限） | infra | Sprint 3 |
-| T-69 | `flutter build macos --release` 產出正式 .app bundle，驗證功能正常 | FE | Sprint 3 |
-| T-70 | Apple Developer 簽名與公證（codesign + notarytool），確保 Gatekeeper 放行 | infra | Sprint 3 |
-| T-71 | 打包為 .dmg 安裝檔（create-dmg），含背景圖與 Applications 捷徑 | infra | Sprint 3 |
+| T-66 | 設定 App Icon（1024x1024 icon set），替換 Flutter 預設圖示 | design | ✅ Done |
+| T-67 | 設定 Bundle ID、App 名稱、版本號（CFBundleIdentifier、CFBundleShortVersionString） | infra | ✅ Done |
+| T-68 | 設定 macOS entitlements（網路存取、檔案存取等沙盒權限） | infra | ✅ Done |
+| T-69 | `flutter build macos --release` 產出正式 .app bundle，驗證功能正常 | FE | ✅ Done |
+| T-70 | Apple Developer 簽名與公證（codesign + notarytool），確保 Gatekeeper 放行 | infra | 待取得 Apple Developer 帳號 |
+| T-71 | 打包為 .dmg 安裝檔（create-dmg），含背景圖與 Applications 捷徑 | infra | ✅ Done |
 
 ---
 

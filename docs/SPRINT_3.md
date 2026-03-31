@@ -36,12 +36,12 @@
 ### S-13 macOS App 打包與發佈
 | Task | 說明 | 類型 | 狀態 |
 |------|------|------|------|
-| T-66 | 設定 App Icon（1024x1024 icon set） | design | |
-| T-67 | 設定 Bundle ID、App 名稱、版本號 | infra | |
-| T-68 | 設定 macOS entitlements（沙盒權限） | infra | |
-| T-69 | `flutter build macos --release` 產出 .app bundle | FE | |
-| T-70 | Apple Developer 簽名與公證（codesign + notarytool） | infra | |
-| T-71 | 打包為 .dmg 安裝檔（create-dmg） | infra | |
+| T-66 | 設定 App Icon（1024x1024 icon set） | design | ✅ Done |
+| T-67 | 設定 Bundle ID、App 名稱、版本號 | infra | ✅ Done |
+| T-68 | 設定 macOS entitlements（沙盒權限） | infra | ✅ Done |
+| T-69 | `flutter build macos --release` 產出 .app bundle | FE | ✅ Done |
+| T-70 | Apple Developer 簽名與公證（codesign + notarytool） | infra | 待取得帳號 |
+| T-71 | 打包為 .dmg 安裝檔（create-dmg） | infra | ✅ Done |
 
 ## 交付標準
 - 房東可從 CSV 批次匯入房源
