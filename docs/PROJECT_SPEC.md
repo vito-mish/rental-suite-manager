@@ -22,6 +22,7 @@
 - [S-10 通知與推播系統](#s-10-通知與推播系統)
 - [S-11 租客繳費查詢網頁](#s-11-租客繳費查詢網頁)
 - [S-12 API Request Log 查詢系統](#s-12-api-request-log-查詢系統)
+- [S-13 macOS App 打包與發佈](#s-13-macos-app-打包與發佈)
 
 ---
 
@@ -44,8 +45,8 @@
 | Repo | `rental-suite-manager` |
 | 副標題 | Manage smarter, rent easier. |
 | 支援平台 | macOS、Windows、Web、Android、iOS |
-| Stories | 12 |
-| Tasks | 65 |
+| Stories | 13 |
+| Tasks | 71 |
 
 ---
 
@@ -222,4 +223,19 @@
 
 ---
 
-*共 12 Stories、65 Tasks*
+## S-13 macOS App 打包與發佈
+
+**目標**：將 Flutter macOS app 打包為可分發的正式版本，包含簽名、圖示與安裝檔。
+
+| Task | 說明 | 類型 | 狀態 |
+|------|------|------|------|
+| T-66 | 設定 App Icon（1024x1024 icon set），替換 Flutter 預設圖示 | design | Sprint 3 |
+| T-67 | 設定 Bundle ID、App 名稱、版本號（CFBundleIdentifier、CFBundleShortVersionString） | infra | Sprint 3 |
+| T-68 | 設定 macOS entitlements（網路存取、檔案存取等沙盒權限） | infra | Sprint 3 |
+| T-69 | `flutter build macos --release` 產出正式 .app bundle，驗證功能正常 | FE | Sprint 3 |
+| T-70 | Apple Developer 簽名與公證（codesign + notarytool），確保 Gatekeeper 放行 | infra | Sprint 3 |
+| T-71 | 打包為 .dmg 安裝檔（create-dmg），含背景圖與 Applications 捷徑 | infra | Sprint 3 |
+
+---
+
+*共 13 Stories、71 Tasks*

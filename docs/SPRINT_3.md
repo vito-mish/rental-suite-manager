@@ -33,9 +33,20 @@
 | T-59 | API 部署至 Render 免費方案（`.onrender.com`），設定環境變數與 Supabase 連線 | infra | ✅ Done |
 | T-60 | Web 部署至 Vercel 免費方案（`.vercel.app`），設定 API base URL | infra | ✅ Done |
 
+### S-13 macOS App 打包與發佈
+| Task | 說明 | 類型 | 狀態 |
+|------|------|------|------|
+| T-66 | 設定 App Icon（1024x1024 icon set） | design | |
+| T-67 | 設定 Bundle ID、App 名稱、版本號 | infra | |
+| T-68 | 設定 macOS entitlements（沙盒權限） | infra | |
+| T-69 | `flutter build macos --release` 產出 .app bundle | FE | |
+| T-70 | Apple Developer 簽名與公證（codesign + notarytool） | infra | |
+| T-71 | 打包為 .dmg 安裝檔（create-dmg） | infra | |
+
 ## 交付標準
 - 房東可從 CSV 批次匯入房源
 - 合約可從模板產生並匯出 PDF
 - 逾期租金有自動提醒
 - 帳務可匯出報表
 - 租客可透過網頁輸入姓名+電話查詢合約及繳費紀錄
+- macOS app 可正式打包為簽名的 .dmg 安裝檔
